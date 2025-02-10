@@ -2,54 +2,83 @@ import UIKit
 
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
-    var collectionView: UICollectionView!
-    let items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10"]
+    @IBOutlet weak var collectionView: UICollectionView!
+    //var collectionView: UICollectionView!
+        let items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10"]
+            let logoImageView = UIImageView()  // Logo image view
+            let tabBar = UITabBar() // Or your custom tab bar view. If you use a UITabBarController, you likely won't need this.
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground // Use system background for light/dark mode support
-           title = "Home" // Set the title that will appear on the tab
-           // Add any other setup for your Home view here
-           let label = UILabel()
-           label.text = "Home View"
-           label.translatesAutoresizingMaskIntoConstraints = false
-           view.addSubview(label)
-           NSLayoutConstraint.activate([
-               label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-               label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-           ])
+        view.backgroundColor = .systemBackground
+        title = "Home"
+        
+        // 1. Set up Scroll View
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor) // Important: Scroll view fills the main view
+        ])
+        
+        
+        // 2. Add Logo Image View
+        logoImageView.image = UIImage(named: "your_logo_image") // Replace with your logo image
+        logoImageView.contentMode = .scaleAspectFit // Or .scaleAspectFill, etc.
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(logoImageView)
+        
+        NSLayoutConstraint.activate([
+            logoImageView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20), // Adjust top margin
+            logoImageView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
+            logoImageView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
+            logoImageView.heightAnchor.constraint(equalToConstant: 80) // Adjust height as needed
+        ])
+        
+        // 3. Add Collection View
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: view.frame.width - 20, height: 100)
         layout.minimumInteritemSpacing = 10
         layout.minimumLineSpacing = 10
         
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        //collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout) // Initialize here if not using an IBOutlet
         collectionView.backgroundColor = .white
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: "FeedCell")
-        view.addSubview(collectionView)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false // VERY IMPORTANT
+        scrollView.addSubview(collectionView)
         
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 20), // Space below logo
+            collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            collectionView.heightAnchor.constraint(equalToConstant: view.frame.height * 0.6) // Adjust as needed
+        ])
         
- 
-        if let tabBar = self.tabBarController?.tabBar { // Safely unwrap the tab bar
-            NSLayoutConstraint.activate([
-                collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-                collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: tabBar.topAnchor) // Constrain to *above* the tab bar
-            ])
-        } else { // Handle the case where there is no tab bar
-            NSLayoutConstraint.activate([
-                collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-                collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
-        }}
-
+        
+        // 4. Add Tab Bar (If NOT using a UITabBarController)
+        // If you are using a UITabBarController, you likely do NOT need this code.
+        // Instead, just embed this ViewController in the UITabBarController.
+        tabBar.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(tabBar) // Add to scroll view!
+        
+        NSLayoutConstraint.activate([
+            tabBar.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20), // Space below collection view
+            tabBar.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            tabBar.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            tabBar.heightAnchor.constraint(equalToConstant: 49) // Standard tab bar height
+        ])
+        
+        // 5. Set Scroll View Content Size (Crucial!)
+        // Calculate the total height of all your subviews within the scroll view.
+        // This is a simplified example. You might need to adjust based on your layout.
+        scrollView.contentSize = CGSize(width: view.frame.width, height: logoImageView.frame.height + collectionView.frame.height + tabBar.frame.height + 40) // Add up heights and margins
+    }
     // MARK: - UICollectionViewDataSource (These methods MUST be implemented)
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
