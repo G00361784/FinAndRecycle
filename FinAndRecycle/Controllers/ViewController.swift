@@ -2,133 +2,109 @@ import UIKit
 
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var collectionView: UICollectionView!
     //var collectionView: UICollectionView!
-        let items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10"]
-            let logoImageView = UIImageView()  // Logo image view
-            let tabBar = UITabBar() // Or your custom tab bar view. If you use a UITabBarController, you likely won't need this.
+    let items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10"]
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        title = "Home"
-        
-        // 1. Set up Scroll View
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(scrollView)
-        
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor) // Important: Scroll view fills the main view
-        ])
-        
-        
-        // 2. Add Logo Image View
-        logoImageView.image = UIImage(named: "your_logo_image") // Replace with your logo image
-        logoImageView.contentMode = .scaleAspectFit // Or .scaleAspectFill, etc.
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(logoImageView)
-        
-        NSLayoutConstraint.activate([
-            logoImageView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20), // Adjust top margin
-            logoImageView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 20),
-            logoImageView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -20),
-            logoImageView.heightAnchor.constraint(equalToConstant: 80) // Adjust height as needed
-        ])
-        
-        // 3. Add Collection View
-        let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: view.frame.width - 20, height: 100)
-        layout.minimumInteritemSpacing = 10
-        layout.minimumLineSpacing = 10
-        
-        //collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout) // Initialize here if not using an IBOutlet
-        collectionView.backgroundColor = .white
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.register(FeedCell.self, forCellWithReuseIdentifier: "FeedCell")
-        collectionView.translatesAutoresizingMaskIntoConstraints = false // VERY IMPORTANT
-        scrollView.addSubview(collectionView)
-        
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 20), // Space below logo
-            collectionView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            collectionView.heightAnchor.constraint(equalToConstant: view.frame.height * 0.6) // Adjust as needed
-        ])
-        
-        
-        // 4. Add Tab Bar (If NOT using a UITabBarController)
-        // If you are using a UITabBarController, you likely do NOT need this code.
-        // Instead, just embed this ViewController in the UITabBarController.
-        tabBar.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.addSubview(tabBar) // Add to scroll view!
-        
-        NSLayoutConstraint.activate([
-            tabBar.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20), // Space below collection view
-            tabBar.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            tabBar.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            tabBar.heightAnchor.constraint(equalToConstant: 49) // Standard tab bar height
-        ])
-        
-        // 5. Set Scroll View Content Size (Crucial!)
-        // Calculate the total height of all your subviews within the scroll view.
-        // This is a simplified example. You might need to adjust based on your layout.
-        scrollView.contentSize = CGSize(width: view.frame.width, height: logoImageView.frame.height + collectionView.frame.height + tabBar.frame.height + 40) // Add up heights and margins
-    }
-    // MARK: - UICollectionViewDataSource (These methods MUST be implemented)
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            view.backgroundColor = .systemBackground
+            title = "Home"
 
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
+            let layout = UICollectionViewFlowLayout()
+            layout.itemSize = CGSize(width: 200, height: 100) // Adjust as needed
+            layout.minimumInteritemSpacing = 10
+            layout.minimumLineSpacing = 10
+            layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return items.count
-    }
+            collectionView.collectionViewLayout = layout // No need for conditional creation
+            collectionView.backgroundColor = .white
+            collectionView.register(FeedCell.self, forCellWithReuseIdentifier: "FeedCell")
+            collectionView.dataSource = self
+            collectionView.delegate = self
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FeedCell", for: indexPath) as! FeedCell
-        cell.configure(with: items[indexPath.row])
-        return cell
-    }
+            // Content Size (Important!)
+            // Calculate content size AFTER layout is set and cells are created
+            DispatchQueue.main.async { // Ensure layout is complete
+                self.scrollView.contentSize = self.collectionView.contentSize
+            }
+        }
 
-    // MARK: - UICollectionViewDelegate (Optional, but often useful)
+        // MARK: - UICollectionViewDataSource
 
-    // Example delegate method (you can add more as needed)
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("Selected item at index: \(indexPath.row)")
-        // Handle item selection here
-    }
-}
+        func numberOfSections(in collectionView: UICollectionView) -> Int {
+            return 1
+        }
 
-class FeedCell: UICollectionViewCell {
+        func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+            return items.count
+        }
 
-    let label = UILabel() // Example label
+        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FeedCell", for: indexPath) as! FeedCell
+            cell.configure(with: items[indexPath.row], target: self, action: #selector(buttonTapped(_:)))
+            cell.button.tag = indexPath.row // Set the tag to identify the button
+            return cell
+        }
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupViews()
-    }
 
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setupViews()
-    }
+        // MARK: - Button Action
+        @objc func buttonTapped(_ sender: UIButton) {
+            let index = sender.tag
+            print("Button tapped at index: \(index)")
+            // Get the corresponding item
+            let selectedItem = items[index]
+            print("Selected item: \(selectedItem)")
 
-    func setupViews() {
-        // Add and configure your cell's subviews (labels, images, etc.)
-        label.frame = CGRect(x: 10, y: 10, width: contentView.frame.width - 20, height: 80)
-        label.numberOfLines = 0
-        contentView.addSubview(label)
-        contentView.backgroundColor = .lightGray // Example background color
-        layer.cornerRadius = 8 // Example corner radius
+            // Example: Navigate to a new view controller
+            let newVC = DetailViewController() // Replace with your actual view controller
+            newVC.item = selectedItem // Pass the selected item if needed
+            navigationController?.pushViewController(newVC, animated: true)
+        }
 
     }
 
-    func configure(with item: String) {
-        label.text = item
+    class FeedCell: UICollectionViewCell {
+
+        let button = UIButton()
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            setupViews()
+        }
+
+        required init?(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+            setupViews()
+        }
+
+        func setupViews() {
+            button.frame = contentView.bounds // Button fills the cell
+            button.setTitleColor(.black, for: .normal) // Set title color
+            button.backgroundColor = .lightGray
+            contentView.addSubview(button)
+            button.layer.cornerRadius = 8
+        }
+
+        func configure(with item: String, target: Any?, action: Selector?) {
+            button.setTitle(item, for: .normal)
+            button.addTarget(target, action: action!, for: .touchUpInside)
+        }
     }
-}
+
+    // Example Detail View Controller (Replace with your actual VC)
+    class DetailViewController: UIViewController {
+        var item: String?
+
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            view.backgroundColor = .white
+            title = "Details"
+
+            let label = UILabel(frame: view.bounds)
+            label.text = item
+            label.textAlignment = .center
+            view.addSubview(label)
+        }
+    }
