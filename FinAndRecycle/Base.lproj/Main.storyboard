@@ -92,10 +92,10 @@
             </objects>
             <point key="canvasLocation" x="1028.2442748091603" y="3.5211267605633805"/>
         </scene>
-        <!--View Controller-->
+        <!--Login View Controller-->
         <scene sceneID="BW0-qb-xEv">
             <objects>
-                <viewController id="fCl-5B-xOO" sceneMemberID="viewController">
+                <viewController id="fCl-5B-xOO" customClass="LoginViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="pzU-hg-uqo">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -105,6 +105,9 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <action selector="LoginEmail:" destination="d9x-UD-afH" eventType="editingDidEnd" id="lE9-Pl-aWL"/>
+                                </connections>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="NGB-Xl-Dib">
                                 <rect key="frame" x="62" y="438" width="278" height="34"/>
@@ -141,7 +144,8 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Login"/>
                                 <connections>
-                                    <segue destination="x16-9n-Z5t" kind="show" id="AHR-cx-MbZ"/>
+                                    <action selector="loginPresssed:" destination="d9x-UD-afH" eventType="touchUpInside" id="fqz-bP-IRL"/>
+                                    <segue destination="x16-9n-Z5t" kind="show" identifier="toHomeScreenFromL" id="AHR-cx-MbZ"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="or" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wmD-g2-JL4">
@@ -156,8 +160,13 @@
                         <color key="backgroundColor" systemColor="systemIndigoColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="Kgw-Nv-C2x"/>
+                    <connections>
+                        <outlet property="LoginEmail" destination="jmG-zq-fgq" id="s6r-kS-6IW"/>
+                        <outlet property="LoginPassword" destination="NGB-Xl-Dib" id="faF-5q-BGc"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mt2-cx-88p" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="d9x-UD-afH" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1872.5190839694656" y="5.6338028169014089"/>
         </scene>
@@ -274,7 +283,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="Z4y-yf-e6A"/>
+        <segue reference="AHR-cx-MbZ"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="clipboard" catalog="system" width="98" height="128"/>

@@ -24,8 +24,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             collectionView.dataSource = self
             collectionView.delegate = self
 
-            // Content Size (Important!)
-            // Calculate content size AFTER layout is set and cells are created
+           
             DispatchQueue.main.async { // Ensure layout is complete
                 self.scrollView.contentSize = self.collectionView.contentSize
             }
@@ -53,11 +52,11 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         @objc func buttonTapped(_ sender: UIButton) {
             let index = sender.tag
             print("Button tapped at index: \(index)")
-            // Get the corresponding item
+            
             let selectedItem = items[index]
             print("Selected item: \(selectedItem)")
 
-            // Example: Navigate to a new view controller
+           
             let newVC = DetailViewController() // Replace with your actual view controller
             newVC.item = selectedItem // Pass the selected item if needed
             navigationController?.pushViewController(newVC, animated: true)
@@ -93,7 +92,6 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         }
     }
 
-    // Example Detail View Controller (Replace with your actual VC)
     class DetailViewController: UIViewController {
         var item: String?
 
