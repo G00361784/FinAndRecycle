@@ -18,10 +18,21 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var LoginEmail: UITextField!
     
     @IBOutlet weak var LoginPassword: UITextField!
-    @IBAction func loginPresssed(_ sender: UIButton) {
+    
+    var authenticationSuccessful = false // This flag is crucial
+
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if identifier == "toHomeScreenFromL" { // Check the segue identifier
+            return authenticationSuccessful // A boolean flag you set in your authentication callback
+        }
+        return true // Allow other segues to perform
+    }
+    
+    @IBAction func loginPressed(_ sender: UIButton) {
         guard let email = LoginEmail.text, !email.isEmpty,
                      let password = LoginPassword.text, !password.isEmpty else {
-                   showAlert(message: "Please enter both email and password.") // Improved error handling
+                   showAlert(message: "Please enter both email and password.") 
                    return
                }
         
@@ -31,11 +42,14 @@ class LoginViewController: UIViewController {
             
             Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
                 guard let self = self else { return }
-                if let e = error{
-                    print(e.localizedDescription)
-                }else{
-                    self.performSegue(withIdentifier: "toHomeScreenFromL", sender: self)
-                }
+                if let e = error {
+                            print(e.localizedDescription)
+                            self.authenticationSuccessful = false // Set to false on error
+                            // Show the error message to the user.
+                        } else {
+                            self.authenticationSuccessful = true  // Set to true on success
+                            // No need to call performSegue here.
+                        }
             }
             
         

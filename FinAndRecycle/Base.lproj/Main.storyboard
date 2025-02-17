@@ -144,8 +144,8 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Login"/>
                                 <connections>
-                                    <action selector="loginPresssed:" destination="d9x-UD-afH" eventType="touchUpInside" id="fqz-bP-IRL"/>
-                                    <segue destination="x16-9n-Z5t" kind="show" identifier="toHomeScreenFromL" id="AHR-cx-MbZ"/>
+                                    <action selector="loginPressed:" destination="fCl-5B-xOO" eventType="touchUpInside" id="way-Th-1vi"/>
+                                    <segue destination="x16-9n-Z5t" kind="show" identifier="toHomeScreenFormL" id="tSe-e4-33e"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="or" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wmD-g2-JL4">
@@ -170,10 +170,10 @@
             </objects>
             <point key="canvasLocation" x="1872.5190839694656" y="5.6338028169014089"/>
         </scene>
-        <!--View Controller-->
+        <!--Register View Controller-->
         <scene sceneID="21i-N5-xCj">
             <objects>
-                <viewController id="rtK-Cy-sux" sceneMemberID="viewController">
+                <viewController id="rtK-Cy-sux" customClass="RegisterViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="XdC-O2-AUH">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -198,7 +198,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Register Password" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tsq-r9-BEo">
-                                <rect key="frame" x="57" y="352" width="108" height="21"/>
+                                <rect key="frame" x="57" y="352" width="183" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -210,7 +210,8 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Register"/>
                                 <connections>
-                                    <segue destination="x16-9n-Z5t" kind="show" id="Z4y-yf-e6A"/>
+                                    <action selector="RegisterPressed:" destination="rtK-Cy-sux" eventType="touchUpInside" id="GG7-dV-5gK"/>
+                                    <segue destination="x16-9n-Z5t" kind="show" identifier="toHomeScreenFromR" id="Z4y-yf-e6A"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -218,10 +219,14 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="A9Q-Ot-4og"/>
+                    <connections>
+                        <outlet property="RegisterEmail" destination="Dcg-bT-sZq" id="4Dk-oX-iI7"/>
+                        <outlet property="RegisterPassword" destination="DK9-1C-qRx" id="58b-4w-oLl"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="G6w-WS-fmv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2396" y="735"/>
+            <point key="canvasLocation" x="2394.6564885496182" y="734.50704225352115"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="cCG-ja-zGO">
@@ -283,7 +288,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="AHR-cx-MbZ"/>
+        <segue reference="tSe-e4-33e"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="clipboard" catalog="system" width="98" height="128"/>
