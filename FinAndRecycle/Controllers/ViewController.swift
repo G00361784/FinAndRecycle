@@ -5,7 +5,15 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var collectionView: UICollectionView!
     //var collectionView: UICollectionView!
-    let items = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10"]
+    let items = [
+            "Item 1": DetailViewController1(), // Associate item title with a view controller
+            "Item 2": DetailViewController2(),
+            "Item 3": DetailViewController3(),
+            "Item 4": DetailViewController1(), // Example of reusing view controllers
+            "Item 5": DetailViewController2(),
+            "Item 6": DetailViewController3(),
+            
+        ]
 
         override func viewDidLoad() {
             super.viewDidLoad()
@@ -13,19 +21,18 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             title = "Home"
 
             let layout = UICollectionViewFlowLayout()
-            layout.itemSize = CGSize(width: 200, height: 100) // Adjust as needed
+            layout.itemSize = CGSize(width: 200, height: 100)
             layout.minimumInteritemSpacing = 10
             layout.minimumLineSpacing = 10
             layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
-            collectionView.collectionViewLayout = layout // No need for conditional creation
+            collectionView.collectionViewLayout = layout
             collectionView.backgroundColor = .white
             collectionView.register(FeedCell.self, forCellWithReuseIdentifier: "FeedCell")
             collectionView.dataSource = self
             collectionView.delegate = self
 
-           
-            DispatchQueue.main.async { // Ensure layout is complete
+            DispatchQueue.main.async {
                 self.scrollView.contentSize = self.collectionView.contentSize
             }
         }
@@ -42,30 +49,26 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
         func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FeedCell", for: indexPath) as! FeedCell
-            cell.configure(with: items[indexPath.row], target: self, action: #selector(buttonTapped(_:)))
-            cell.button.tag = indexPath.row // Set the tag to identify the button
+            let itemTitle = Array(items.keys)[indexPath.row] // Get the item title
+            cell.configure(with: itemTitle, target: self, action: #selector(buttonTapped(_:)))
+            cell.button.tag = indexPath.row
             return cell
         }
-
 
         // MARK: - Button Action
         @objc func buttonTapped(_ sender: UIButton) {
             let index = sender.tag
+            let itemTitle = Array(items.keys)[index]
+            let destinationVC = items[itemTitle]! // Get the associated view controller
+
             print("Button tapped at index: \(index)")
-            
-            let selectedItem = items[index]
-            print("Selected item: \(selectedItem)")
+            print("Selected item: \(itemTitle)")
 
-           
-            let newVC = DetailViewController() // Replace with your actual view controller
-            newVC.item = selectedItem // Pass the selected item if needed
-            navigationController?.pushViewController(newVC, animated: true)
+            navigationController?.pushViewController(destinationVC, animated: true)
         }
-
     }
 
     class FeedCell: UICollectionViewCell {
-
         let button = UIButton()
 
         override init(frame: CGRect) {
@@ -79,8 +82,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         }
 
         func setupViews() {
-            button.frame = contentView.bounds // Button fills the cell
-            button.setTitleColor(.black, for: .normal) // Set title color
+            button.frame = contentView.bounds
+            button.setTitleColor(.black, for: .normal)
             button.backgroundColor = .lightGray
             contentView.addSubview(button)
             button.layer.cornerRadius = 8
@@ -92,16 +95,40 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         }
     }
 
-    class DetailViewController: UIViewController {
-        var item: String?
 
+    // Example Detail View Controllers (Create as many as you need)
+
+    class DetailViewController1: UIViewController {
         override func viewDidLoad() {
             super.viewDidLoad()
             view.backgroundColor = .white
-            title = "Details"
-
+            title = "Details 1"  // Set a specific title
             let label = UILabel(frame: view.bounds)
-            label.text = item
+            label.text = "Detail View 1"
+            label.textAlignment = .center
+            view.addSubview(label)
+        }
+    }
+
+    class DetailViewController2: UIViewController {
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            view.backgroundColor = .white
+            title = "Details 2" // Set a specific title
+            let label = UILabel(frame: view.bounds)
+            label.text = "Detail View 2"
+            label.textAlignment = .center
+            view.addSubview(label)
+        }
+    }
+
+    class DetailViewController3: UIViewController {
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            view.backgroundColor = .white
+            title = "Details 3" // Set a specific title
+            let label = UILabel(frame: view.bounds)
+            label.text = "Detail View 3"
             label.textAlignment = .center
             view.addSubview(label)
         }
