@@ -1,4 +1,5 @@
 import UIKit
+import Foundation
 
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
@@ -14,12 +15,69 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             "Item 6": DetailViewController3(),
             
         ]
+        //let apiKey = "f869c8bcd91543ac9b9689504470c0be"
+    
+    struct NewsResponse: Codable {
+        let articles: [Article]
+    }
 
+    struct Article: Codable {
+        let title: String?
+        let description: String?
+        let urlToImage: String?
+        // Add other fields as needed
+    }
+
+    func fetchNews(completion: @escaping (Result<[Article], Error>) -> Void) {
+        let apiKey = "f869c8bcd91543ac9b9689504470c0be" 
+        let urlString = "https://newsapi.org/v2/everything?q=oceanenviroment&apiKey=\(apiKey)" // Example endpoint
+
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data received", code: 0, userInfo: nil)))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                let newsResponse = try decoder.decode(NewsResponse.self, from: data)
+                completion(.success(newsResponse.articles))
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+
+    // Example usage:
+    
+    
+        
         override func viewDidLoad() {
             super.viewDidLoad()
             view.backgroundColor = .systemBackground
             title = "Home"
-
+            
+            fetchNews { result in
+                switch result {
+                case .success(let articles):
+                    for article in articles {
+                        print(article.title ?? "No Title")
+                    }
+                case .failure(let error):
+                    print("Error: \(error)")
+                }
+            }
+            
             let layout = UICollectionViewFlowLayout()
             layout.itemSize = CGSize(width: 200, height: 100)
             layout.minimumInteritemSpacing = 10
