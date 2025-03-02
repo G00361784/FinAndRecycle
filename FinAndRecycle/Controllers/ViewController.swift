@@ -60,11 +60,13 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
         func setupCollectionView() {
             let layout = UICollectionViewFlowLayout()
-            layout.itemSize = CGSize(width: 300, height: 120)
             layout.minimumInteritemSpacing = 10
             layout.minimumLineSpacing = 10
             layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+                
+            layout.itemSize = CGSize(width: 350, height: 180) // Adjust width and height as needed
 
+            
             collectionView.collectionViewLayout = layout
             collectionView.backgroundColor = .white
             collectionView.register(FeedCell.self, forCellWithReuseIdentifier: "FeedCell")
