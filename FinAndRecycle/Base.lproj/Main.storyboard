@@ -3,7 +3,6 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
-        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -137,7 +136,7 @@
                                 <buttonConfiguration key="configuration" style="tinted" title="Login"/>
                                 <connections>
                                     <action selector="loginPressed:" destination="fCl-5B-xOO" eventType="touchUpInside" id="way-Th-1vi"/>
-                                    <segue destination="alM-Xl-SST" kind="showDetail" identifier="toHomeScreenFromL" id="T0m-Y4-hng"/>
+                                    <segue destination="BYZ-38-t0r" kind="show" identifier="toHomeScreenFromL" id="CBu-YU-XGl"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -196,7 +195,7 @@
                                 <buttonConfiguration key="configuration" style="tinted" title="Register"/>
                                 <connections>
                                     <action selector="RegisterPressed:" destination="rtK-Cy-sux" eventType="touchUpInside" id="GG7-dV-5gK"/>
-                                    <segue destination="alM-Xl-SST" kind="show" identifier="toHomeScreenFromR" id="zAj-wb-jrb"/>
+                                    <segue destination="BYZ-38-t0r" kind="show" identifier="toHomeScreenFromR" id="pPz-fs-fBn"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -213,47 +212,7 @@
             </objects>
             <point key="canvasLocation" x="3277" y="733"/>
         </scene>
-        <!--View Controller-->
-        <scene sceneID="cCG-ja-zGO">
-            <objects>
-                <viewController id="x16-9n-Z5t" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="hqp-7j-kI5">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Welcome to Fin and Recycle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j8l-77-9ap">
-                                <rect key="frame" x="27" y="252" width="338" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="28"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <tabBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2iH-Pa-pWD">
-                                <rect key="frame" x="0.0" y="769" width="393" height="49"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <items>
-                                    <tabBarItem title="Home" image="house" catalog="system" id="HAh-4N-Pu4">
-                                        <color key="badgeColor" systemColor="systemBlueColor"/>
-                                        <imageReference key="selectedImage" image="house" catalog="system" symbolScale="medium"/>
-                                    </tabBarItem>
-                                    <tabBarItem title="Log" image="folder" catalog="system" id="I1V-n1-ec5"/>
-                                    <tabBarItem title="Bottle Banks" image="trash.slash" catalog="system" id="r2k-cp-Zaf"/>
-                                    <tabBarItem title="Ask Us" image="clipboard" catalog="system" id="uQ0-7v-qms"/>
-                                    <tabBarItem systemItem="more" id="V6a-2y-FxV"/>
-                                </items>
-                            </tabBar>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="wGu-uK-Tam"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="3MZ-fR-iuY"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="stb-8T-Wrx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="6003.8167938931292" y="5.6338028169014089"/>
-        </scene>
-        <!--View Controller-->
+        <!--Item-->
         <scene sceneID="RE2-hf-VPN">
             <objects>
                 <viewController id="xqB-HD-61M" sceneMemberID="viewController">
@@ -263,10 +222,11 @@
                         <viewLayoutGuide key="safeArea" id="IhV-IB-TOz"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <tabBarItem key="tabBarItem" title="Item" id="kFc-7i-c3r"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8NV-Xd-s45" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6932.06106870229" y="3.5211267605633805"/>
+            <point key="canvasLocation" x="1798" y="812"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="U4k-uq-rqj">
@@ -280,6 +240,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="alM-Xl-SST" kind="relationship" relationship="viewControllers" id="4Sg-Lc-yMs"/>
+                        <segue destination="xqB-HD-61M" kind="relationship" relationship="viewControllers" id="Icf-TE-nAS"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="O1w-zI-rAB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -294,7 +255,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="LEv-ao-f2I"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="AHB-Yh-14K">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -308,18 +269,11 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="T0m-Y4-hng"/>
+        <segue reference="pPz-fs-fBn"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="clipboard" catalog="system" width="98" height="128"/>
-        <image name="folder" catalog="system" width="128" height="96"/>
-        <image name="house" catalog="system" width="128" height="104"/>
-        <image name="trash.slash" catalog="system" width="113" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemIndigoColor">
             <color red="0.34509803921568627" green="0.33725490196078434" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
