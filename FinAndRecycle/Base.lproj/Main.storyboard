@@ -76,6 +76,34 @@
             </objects>
             <point key="canvasLocation" x="2881.679389312977" y="3.5211267605633805"/>
         </scene>
+        <!--Item-->
+        <scene sceneID="0dU-bS-e02">
+            <objects>
+                <viewController id="Hgu-Yy-gar" customClass="PersonalLogViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bEr-6F-86C">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Step Today" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wvE-Ma-Qyf">
+                                <rect key="frame" x="153" y="275" width="86" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="xT7-QK-9bI"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Item" id="o4a-OD-N64"/>
+                    <connections>
+                        <outlet property="stepsTodayLabel" destination="wvE-Ma-Qyf" id="uoE-L4-fgf"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="E1s-Js-vPF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="600.76335877862596" y="767.6056338028169"/>
+        </scene>
         <!--Login View Controller-->
         <scene sceneID="BW0-qb-xEv">
             <objects>
@@ -278,6 +306,7 @@
                     <connections>
                         <segue destination="alM-Xl-SST" kind="relationship" relationship="viewControllers" id="4Sg-Lc-yMs"/>
                         <segue destination="xqB-HD-61M" kind="relationship" relationship="viewControllers" id="Icf-TE-nAS"/>
+                        <segue destination="Hgu-Yy-gar" kind="relationship" relationship="viewControllers" id="s1d-hv-Mi6"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="O1w-zI-rAB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
