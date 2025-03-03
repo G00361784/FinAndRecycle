@@ -76,6 +76,22 @@
             </objects>
             <point key="canvasLocation" x="2881.679389312977" y="3.5211267605633805"/>
         </scene>
+        <!--Chart Steps View Controller-->
+        <scene sceneID="GVL-VI-8f6">
+            <objects>
+                <viewController id="AcI-6J-2kc" customClass="ChartStepsViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="iKo-um-b7e">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="dCg-AG-DKG"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="Zeq-En-QRu"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bYi-IB-I2c" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-111" y="1082"/>
+        </scene>
         <!--Item-->
         <scene sceneID="0dU-bS-e02">
             <objects>
@@ -91,6 +107,15 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p46-fQ-bQ4">
+                                <rect key="frame" x="142" y="573" width="108" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="tinted" title="See Charts"/>
+                                <connections>
+                                    <segue destination="AcI-6J-2kc" kind="show" id="gdo-dL-BdK"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="xT7-QK-9bI"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
