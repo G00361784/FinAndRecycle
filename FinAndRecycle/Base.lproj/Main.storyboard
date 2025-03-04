@@ -3,6 +3,7 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -371,11 +372,42 @@
                         <segue destination="alM-Xl-SST" kind="relationship" relationship="viewControllers" id="4Sg-Lc-yMs"/>
                         <segue destination="jWo-AY-74f" kind="relationship" relationship="viewControllers" id="Icf-TE-nAS"/>
                         <segue destination="Hgu-Yy-gar" kind="relationship" relationship="viewControllers" id="s1d-hv-Mi6"/>
+                        <segue destination="i6u-vk-wx4" kind="relationship" relationship="viewControllers" id="zfm-yU-bHQ"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="O1w-zI-rAB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1028.2442748091603" y="3.5211267605633805"/>
+        </scene>
+        <!--Item-->
+        <scene sceneID="1Zr-Yx-eEl">
+            <objects>
+                <viewController id="i6u-vk-wx4" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="loL-Ny-CZK">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jMm-57-v09">
+                                <rect key="frame" x="16" y="178" width="361" height="393"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <standardMapConfiguration key="preferredConfiguration"/>
+                            </mapView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Find bottle banks and recycling centers below" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lpi-na-y9d">
+                                <rect key="frame" x="16" y="149" width="361" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="28f-zL-oWn"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Item" id="cZC-fH-yLX"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vzh-bY-XjH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1797.709923664122" y="-812.67605633802816"/>
         </scene>
         <!--Item-->
         <scene sceneID="4i1-v8-LRd">
