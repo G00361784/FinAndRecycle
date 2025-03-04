@@ -382,7 +382,7 @@
         <!--Item-->
         <scene sceneID="1Zr-Yx-eEl">
             <objects>
-                <viewController id="i6u-vk-wx4" sceneMemberID="viewController">
+                <viewController id="i6u-vk-wx4" customClass="MapsViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="loL-Ny-CZK">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -404,6 +404,9 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Item" id="cZC-fH-yLX"/>
+                    <connections>
+                        <outlet property="mapView" destination="jMm-57-v09" id="jc6-We-a06"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vzh-bY-XjH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
