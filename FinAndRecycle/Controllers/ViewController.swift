@@ -42,23 +42,23 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = 10  // Spacing between items
-        layout.minimumLineSpacing = 10       // Spacing between lines
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        
-        // Adjust item size based on the screen width
-        layout.itemSize = CGSize(width: view.frame.width - 20, height: 200)
-        
+        layout.minimumInteritemSpacing = 10
+        layout.minimumLineSpacing = 15
+        layout.sectionInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+
+        // Set proper item size (adjust width to fit screen)
+        let cellWidth = view.frame.width - 20  // Adjust for padding
+        let cellHeight = view.frame.height * 0.3
+        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+
         collectionView.collectionViewLayout = layout
         collectionView.backgroundColor = .white
-        
-        // Register custom cell for the collection view
         collectionView.register(FeedCell.self, forCellWithReuseIdentifier: "FeedCell")
-        
-        // Set data source and delegate
         collectionView.dataSource = self
         collectionView.delegate = self
     }
+
+
     
     // MARK: - Fetching News from API
     
@@ -124,55 +124,57 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     // MARK: - FeedCell (Custom Collection View Cell)
     class FeedCell: UICollectionViewCell {
-        let newsImageView = UIImageView()  // Image of the news article
-        let titleLabel = UILabel()         // Title of the article
-        let descriptionLabel = UILabel()   // Short description of the article
-        
+        let newsImageView = UIImageView()
+        let titleLabel = UILabel()
+        let descriptionLabel = UILabel()
+
         override init(frame: CGRect) {
             super.init(frame: frame)
-            setupViews() // Setup the cell UI
+            setupViews()
         }
-        
+
         required init?(coder aDecoder: NSCoder) {
             super.init(coder: aDecoder)
             setupViews()
         }
-        
-        // Setup UI elements inside the cell
+
         func setupViews() {
             contentView.backgroundColor = .white
-            contentView.layer.cornerRadius = 8
+            contentView.layer.cornerRadius = 10
             contentView.layer.shadowColor = UIColor.black.cgColor
             contentView.layer.shadowOpacity = 0.1
-            contentView.layer.shadowOffset = CGSize(width: 0, height: 2)
-            contentView.layer.shadowRadius = 4
-            
+            contentView.layer.shadowOffset = CGSize(width: 0, height: 3)
+            contentView.layer.shadowRadius = 5
+
             newsImageView.contentMode = .scaleAspectFill
             newsImageView.clipsToBounds = true
-            newsImageView.layer.cornerRadius = 8
-            
-            titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
+            newsImageView.layer.cornerRadius = 10
+
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 18)  // Larger text
             titleLabel.numberOfLines = 2
-            
-            descriptionLabel.font = UIFont.systemFont(ofSize: 14)
+
+            descriptionLabel.font = UIFont.systemFont(ofSize: 16)  // Larger text
             descriptionLabel.numberOfLines = 3
-            descriptionLabel.textColor = .gray
-            
+            descriptionLabel.textColor = .darkGray
+
             let stackView = UIStackView(arrangedSubviews: [newsImageView, titleLabel, descriptionLabel])
             stackView.axis = .vertical
-            stackView.spacing = 8
+            stackView.spacing = 10
             stackView.translatesAutoresizingMaskIntoConstraints = false
-            
+
             contentView.addSubview(stackView)
-            
+
+            // Adjust image size
+            newsImageView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+
             // Constraints for stackView
-            newsImageView.heightAnchor.constraint(equalToConstant: 120).isActive = true
             stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
         }
-        
+    
+
         // Configures the cell with an article
         func configure(with article: ViewController.Article) {
             titleLabel.text = article.title ?? "No Title"
