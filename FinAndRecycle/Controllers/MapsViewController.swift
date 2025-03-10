@@ -11,7 +11,7 @@ import FirebaseDatabase
 import FirebaseStorage
 
 
-class MapsViewController: UIViewController, MKMapViewDelegate {
+class MapsViewController: UIViewController, MKMapViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
 
@@ -40,6 +40,7 @@ class MapsViewController: UIViewController, MKMapViewDelegate {
         }
         
         @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+            
             if gesture.state == .began {
                 let location = gesture.location(in: mapView)
                 let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
@@ -152,8 +153,9 @@ class MapsViewController: UIViewController, MKMapViewDelegate {
             ref.child("pins").queryOrdered(byChild: "title").queryEqual(toValue: title).observeSingleEvent(of: .value) { snapshot in
                 for child in snapshot.children {
                     if let snap = child as? DataSnapshot, let data = snap.value as? [String: Any], let imageUrl = data["imageUrl"] as? String {
-                        self.showPinDetails(title: title, imageUrl: imageUrl)
-                    }
+                        if let imageUrl = data["imageUrl"] as? String {
+                            self.showPinDetails(title: (title ?? title)!, imageUrl: imageUrl)
+                        }                    }
                 }
             }
         }
