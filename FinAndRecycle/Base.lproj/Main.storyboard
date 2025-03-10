@@ -3,6 +3,7 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -15,7 +16,7 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="KE6-nf-aXt">
@@ -91,7 +92,7 @@
             </objects>
             <point key="canvasLocation" x="-111" y="1082"/>
         </scene>
-        <!--Item-->
+        <!--Travel-->
         <scene sceneID="0dU-bS-e02">
             <objects>
                 <viewController id="Hgu-Yy-gar" customClass="PersonalLogViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
@@ -119,7 +120,7 @@
                         <viewLayoutGuide key="safeArea" id="xT7-QK-9bI"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Item" id="o4a-OD-N64"/>
+                    <tabBarItem key="tabBarItem" title="Travel" image="figure.walk" catalog="system" selectedImage="figure.walk" id="o4a-OD-N64"/>
                     <connections>
                         <outlet property="stepsTodayLabel" destination="wvE-Ma-Qyf" id="uoE-L4-fgf"/>
                     </connections>
@@ -133,7 +134,7 @@
             <objects>
                 <viewController id="fCl-5B-xOO" customClass="LoginViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="pzU-hg-uqo">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RxH-67-2SR">
@@ -211,7 +212,7 @@
             <objects>
                 <viewController id="rtK-Cy-sux" customClass="RegisterViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="XdC-O2-AUH">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Dcg-bT-sZq">
@@ -358,6 +359,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <tabBarAppearance key="standardAppearance"/>
                     </tabBar>
                     <connections>
                         <segue destination="alM-Xl-SST" kind="relationship" relationship="viewControllers" id="4Sg-Lc-yMs"/>
@@ -370,7 +372,7 @@
             </objects>
             <point key="canvasLocation" x="1028.2442748091603" y="3.5211267605633805"/>
         </scene>
-        <!--Item-->
+        <!--Locations-->
         <scene sceneID="1Zr-Yx-eEl">
             <objects>
                 <viewController id="i6u-vk-wx4" customClass="MapsViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
@@ -422,7 +424,7 @@
                         <viewLayoutGuide key="safeArea" id="28f-zL-oWn"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Item" id="cZC-fH-yLX"/>
+                    <tabBarItem key="tabBarItem" title="Locations" image="map" catalog="system" selectedImage="map" id="cZC-fH-yLX"/>
                     <connections>
                         <outlet property="mapView" destination="jMm-57-v09" id="jc6-We-a06"/>
                     </connections>
@@ -431,11 +433,13 @@
             </objects>
             <point key="canvasLocation" x="1797.709923664122" y="-812.67605633802816"/>
         </scene>
-        <!--Item-->
+        <!--Home-->
         <scene sceneID="4i1-v8-LRd">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="alM-Xl-SST" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="15w-9d-1zF"/>
+                    <tabBarItem key="tabBarItem" title="Home" image="house" catalog="system" id="15w-9d-1zF">
+                        <imageReference key="selectedImage" image="house" catalog="system" symbolScale="default"/>
+                    </tabBarItem>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="LEv-ao-f2I"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="AHB-Yh-14K">
@@ -451,11 +455,11 @@
             </objects>
             <point key="canvasLocation" x="1954.9618320610687" y="3.5211267605633805"/>
         </scene>
-        <!--Item-->
+        <!--Game-->
         <scene sceneID="ffn-6P-kgq">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="jWo-AY-74f" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="kFc-7i-c3r"/>
+                    <tabBarItem key="tabBarItem" title="Game" image="gamecontroller" catalog="system" selectedImage="gamecontroller" id="kFc-7i-c3r"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="o2t-jz-COn">
                         <rect key="frame" x="0.0" y="59" width="393" height="44"/>
@@ -472,9 +476,13 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="CBu-YU-XGl"/>
+        <segue reference="SF1-mb-dXy"/>
     </inferredMetricsTieBreakers>
     <resources>
+        <image name="figure.walk" catalog="system" width="94" height="128"/>
+        <image name="gamecontroller" catalog="system" width="128" height="79"/>
+        <image name="house" catalog="system" width="128" height="104"/>
+        <image name="map" catalog="system" width="128" height="112"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
