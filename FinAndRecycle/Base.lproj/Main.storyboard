@@ -318,6 +318,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="gray" title="Claim In Game Rewards"/>
                                 <connections>
+                                    <action selector="ClaimRewardsAction:" destination="xqB-HD-61M" eventType="touchUpInside" id="R52-X3-UWe"/>
                                     <segue destination="2O7-e3-Vem" kind="show" id="XQl-ju-42d"/>
                                 </connections>
                             </button>
