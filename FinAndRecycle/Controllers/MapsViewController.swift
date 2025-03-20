@@ -226,24 +226,41 @@ class MapsViewController: UIViewController, MKMapViewDelegate, UIImagePickerCont
     }
     
     func uploadImageToStorage(image: UIImage) {
-        guard let imageData = image.jpegData(compressionQuality: 0.5) else { return }
-        let storageRef = Storage.storage().reference().child("pin_images/\(UUID().uuidString).jpg")
+        guard let imageData = image.jpegData(compressionQuality: 0.5) else {
+            print("❌ Failed to convert image to JPEG data")
+            return
+        }
         
+        let fileName = UUID().uuidString + ".jpg"
+        let storageRef = Storage.storage().reference().child("pin_images/\(fileName)")
+
+        print("📤 Uploading image to Firebase Storage at path: pin_images/\(fileName)")
+
         storageRef.putData(imageData, metadata: nil) { (metadata, error) in
             if let error = error {
-                print("Error uploading image: \(error.localizedDescription)")
+                print("❌ Error uploading image:", error.localizedDescription)
                 return
             }
             
+            print("✅ Image uploaded successfully!")
+            
             storageRef.downloadURL { (url, error) in
-                guard let downloadURL = url, error == nil else {
-                    print("Error getting download URL: \(error?.localizedDescription ?? "Unknown error")")
+                if let error = error {
+                    print("❌ Error fetching download URL:", error.localizedDescription)
                     return
                 }
+                
+                guard let downloadURL = url else {
+                    print("❌ Download URL is nil")
+                    return
+                }
+
+                print("🌐 Download URL:", downloadURL.absoluteString)
                 self.saveImageURLToPin(imageURL: downloadURL.absoluteString)
             }
         }
     }
+
     
     func saveImageURLToPin(imageURL: String) {
         guard let pinTitle = selectedAnnotationTitle else { return }
