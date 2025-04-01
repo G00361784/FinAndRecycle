@@ -8,7 +8,7 @@
 import UIKit
 import MapKit
 import FirebaseDatabase
-
+import CoreLocation
 
 class MapsViewController: UIViewController, MKMapViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -17,6 +17,7 @@ class MapsViewController: UIViewController, MKMapViewDelegate, UIImagePickerCont
         var ref: DatabaseReference! // Firebase Database reference
         var selectedAnnotationTitle: String? // To store the title of the annotation whose callout was tapped
         var imagePicker = UIImagePickerController()
+        let geocoder = CLGeocoder() // Create a geocoder instance
 
         override func viewDidLoad() {
             super.viewDidLoad()
@@ -37,29 +38,55 @@ class MapsViewController: UIViewController, MKMapViewDelegate, UIImagePickerCont
             mapView.addGestureRecognizer(longPressGesture)
         }
 
-        @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-            if gesture.state == .began {
-                let location = gesture.location(in: mapView)
-                let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
+    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+            guard gesture.state == .began else { return } // Only handle the beginning of the press
 
-                // Ask user for pin title
-                let alert = UIAlertController(title: "New Pin", message: "Enter a title", preferredStyle: .alert)
-                alert.addTextField()
-                let addAction = UIAlertAction(title: "Add Pin", style: .default) { [weak self] _ in
-                    guard let self = self else { return }
-                    let title = alert.textFields?.first?.text ?? "Untitled Pin"
-                    // Add pin locally first for immediate feedback
-                    self.addPin(coordinate: coordinate, title: title)
-                    // Then save to Firebase (without image initially)
-                    self.savePinToFirebase(coordinate: coordinate, title: title)
+            let locationInView = gesture.location(in: mapView)
+            let coordinate = mapView.convert(locationInView, toCoordinateFrom: mapView)
+            let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+
+            // --- Start Reverse Geocoding ---
+            // Show some activity indicator maybe? (Optional)
+
+            geocoder.reverseGeocodeLocation(location) { [weak self] (placemarks, error) in
+                guard let self = self else { return }
+
+                // Always ensure UI updates happen on the main thread
+                DispatchQueue.main.async {
+                     // Hide activity indicator if shown (Optional)
+
+                    var pinTitle = "Unknown Location" // Default title if geocoding fails
+
+                    if let error = error {
+                        print("Reverse geocoding failed with error: \(error.localizedDescription)")
+                        // Keep the default title "Unknown Location" or maybe use coordinates
+                        pinTitle = String(format: "Lat:%.4f, Lon:%.4f", coordinate.latitude, coordinate.longitude)
+                    } else if let placemark = placemarks?.first {
+                        // Successfully got placemark information
+                        // Construct the title using available info
+                        // 'locality' is often the town/city in Ireland
+                        if let town = placemark.locality, !town.isEmpty {
+                            pinTitle = town
+                        } else if let area = placemark.subAdministrativeArea, !area.isEmpty { // Fallback: e.g., County Dublin might be here if locality is nil
+                             pinTitle = area
+                        } else if let country = placemark.country { // Further fallback
+                            pinTitle = "Location in \(country)"
+                        }
+                        // You can customize this further, e.g., add street or county if available:
+                        // print("Placemark details: \(placemark)") // Uncomment to see all available details
+                    }
+
+                    print("Determined pin title: \(pinTitle)")
+
+                    // Now add the pin to the map and save to Firebase with the determined title
+                    self.addPin(coordinate: coordinate, title: pinTitle)
+                    self.savePinToFirebase(coordinate: coordinate, title: pinTitle) // Saves metadata only initially
                 }
-                alert.addAction(addAction)
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-                present(alert, animated: true)
             }
         }
 
-        func addPin(coordinate: CLLocationCoordinate2D, title: String) {
+
+    func addPin(coordinate: CLLocationCoordinate2D, title: String) {
             let annotation = MKPointAnnotation()
             annotation.coordinate = coordinate
             annotation.title = title
@@ -68,18 +95,15 @@ class MapsViewController: UIViewController, MKMapViewDelegate, UIImagePickerCont
 
         // Modified saving function - saves pin metadata, optionally Base64 image data
         // Note: Current flow adds image later, so imageBase64 is usually nil here.
-        func savePinToFirebase(coordinate: CLLocationCoordinate2D, title: String, imageBase64: String? = nil) {
+    func savePinToFirebase(coordinate: CLLocationCoordinate2D, title: String, imageBase64: String? = nil) {
             var pinData: [String: Any] = [
                 "latitude": coordinate.latitude,
                 "longitude": coordinate.longitude,
                 "title": title
-                // No imageURL key anymore
             ]
-            // Add Base64 image data if provided during creation
             if let base64 = imageBase64 {
-                // --- WARNING: Storing large strings here! ---
                 pinData["imageBase64"] = base64
-                print("Including Base64 image data during initial pin save. Monitor DB size/performance.")
+                print("⚠️ Including Base64 image data during initial pin save. Monitor DB size/performance.")
             }
 
             let pinRef = ref.child("pins").childByAutoId()
@@ -87,10 +111,11 @@ class MapsViewController: UIViewController, MKMapViewDelegate, UIImagePickerCont
                 if let error = error {
                     print("Error saving pin: \(error.localizedDescription)")
                 } else {
-                    print("Pin saved successfully with key: \(pinRef.key ?? "N/A")")
+                    print("Pin titled '\(title)' saved successfully with key: \(pinRef.key ?? "N/A")")
                 }
             }
         }
+
 
         // Function to update an existing pin with Base64 encoded image data
         func saveImageDataToPin(base64String: String) {
