@@ -9,160 +9,271 @@ import UIKit
 import SwiftUI
 import Charts
 import HealthKit
-class ChartStepsViewController: UIViewController {
 
-    override func viewDidLoad() {
-            super.viewDidLoad()
+struct ChartDataPoint: Identifiable {
+    let id = UUID()
+    let date: Date
+    let value: Double
+}
 
-            // Request authorization for HealthKit data
-            authorizeHealthKit()
+struct ContentView: View {
+    @State private var stepData: [ChartDataPoint] = []
+    @State private var isLoading: Bool = true
+    @State private var errorMessage: String? = nil
 
-            let contentView = ContentView()
-            let hostingController = UIHostingController(rootView: contentView)
+    private let carbonFactor: Double = 0.2 / 1000
 
-            // Add the SwiftUI view to your view hierarchy
-            addChild(hostingController)
-            view.addSubview(hostingController.view)
-            hostingController.didMove(toParent: self)
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .leading) {
+                if isLoading {
+                    ProgressView("Loading Health Data...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let errorMessage = errorMessage {
+                    Text("Error: \(errorMessage)")
+                        .foregroundColor(.red)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if stepData.isEmpty {
+                     Text("No step data found for the last 7 days.")
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    Text("Daily Steps (Last 7 Days)")
+                        .font(.title2)
+                        .padding(.leading)
 
-            // Set constraints for the SwiftUI view
-            hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-                hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
-        }
+                    Chart {
+                        ForEach(stepData) { dataPoint in
+                            BarMark(
+                                x: .value("Date", dataPoint.date, unit: .day),
+                                y: .value("Steps", dataPoint.value)
+                            )
+                            .foregroundStyle(Color.blue.gradient)
+                        }
+                    }
+                    .chartXAxis {
+                        AxisMarks(values: .stride(by: .day)) { value in
+                            AxisGridLine()
+                            AxisTick()
+                            AxisValueLabel(format: .dateTime.month().day())
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading) {
+                            AxisGridLine()
+                            AxisValueLabel()
+                        }
+                    }
+                    .frame(height: 250)
+                    .padding(.horizontal)
+                    .padding(.bottom)
 
-        // Request authorization to read step count from HealthKit
-        func authorizeHealthKit() {
-            let healthStore = HKHealthStore()
-            let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
 
-            healthStore.requestAuthorization(toShare: [], read: [stepCountType]) { (success, error) in
-                if !success {
-                    // Handle authorization error
-                    print("HealthKit authorization failed:", error?.localizedDescription ?? "Unknown error")
+                    Text("Estimated CO₂ Savings (kg)")
+                        .font(.title2)
+                        .padding(.leading)
+
+                    Chart {
+                        ForEach(stepData) { dataPoint in
+                            let carbonSaving = calculateCarbonSaving(for: dataPoint.value)
+                            BarMark(
+                                x: .value("Date", dataPoint.date, unit: .day),
+                                y: .value("CO₂ Saved", carbonSaving)
+                            )
+                            .foregroundStyle(Color.green.gradient)
+                        }
+                    }
+                    .chartXAxis {
+                         AxisMarks(values: .stride(by: .day)) { value in
+                            AxisGridLine()
+                            AxisTick()
+                            AxisValueLabel(format: .dateTime.month().day())
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading) {
+                            AxisGridLine()
+                            AxisValueLabel()
+                        }
+                    }
+                    .frame(height: 250)
+                    .padding(.horizontal)
+
+                    Spacer()
                 }
             }
-        }
-
-    struct ContentView: View {
-            @State private var stepData: [(String, Double)] = []
-
-            var body: some View {
-                VStack {
-                    // First chart (steps)
-                    Chart {
-                        ForEach(stepData, id: \.0) { dateString, steps in
-                            BarMark(
-                                x: .value("Date", dateString),
-                                y: .value("Steps", steps)
-                            )
-                            .foregroundStyle(by: .value("Date", dateString))
-                        }
-                    }
-                    .chartXAxis {
-                        AxisMarks(position: .bottom) {
-                            AxisGridLine()
-                            AxisValueLabel(centered: true, anchor: .top) {
-                                Text("")
-                            }
-                        }
-                    }
-                    .chartYAxis {
-                        AxisMarks(position: .leading) {
-                            AxisGridLine()
-                            AxisValueLabel()
-                        }
-                    }
-                    .frame(height: 200)
-                    .padding()
-
-                    // Second chart (carbon savings)
-                    Chart {
-                        ForEach(stepData, id: \.0) { dateString, steps in
-                            let carbonSaving = calculateCarbonSaving(for: steps)
-
-                            BarMark(
-                                x: .value("Date", dateString),
-                                y: .value("CO2 Savings (kg)", carbonSaving)
-                            )
-                            .foregroundStyle(by: .value("Date", dateString))
-                        }
-                    }
-                    .chartXAxis {
-                        AxisMarks(position: .bottom) {
-                            AxisGridLine()
-                            AxisValueLabel(centered: true, anchor: .top) {
-                                Text("")
-                            }
-                        }
-                    }
-                    .chartYAxis {
-                        AxisMarks(position: .leading) {
-                            AxisGridLine()
-                            AxisValueLabel()
-                        }
-                    }
-                    .frame(height: 200)
-                    .padding()
-                }
-                .onAppear {
+            .navigationTitle("Activity & Savings")
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                if stepData.isEmpty && errorMessage == nil {
                     fetchStepData()
                 }
             }
+        }
+        .navigationViewStyle(.stack)
+    }
 
-        
-        func fetchStepData() {
-            let healthStore = HKHealthStore()
-            let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-            
-            // Create a predicate to get data from the last 7 days
-            let now = Date()
-            let startDate = Calendar.current.date(byAdding: .day, value: -7, to: now)!
-            let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now, options: .strictStartDate)
-            
-            // Create the query
-            let query = HKStatisticsCollectionQuery(quantityType: stepCountType,
-                                                    quantitySamplePredicate: predicate,
-                                                    options: .cumulativeSum,
-                                                    anchorDate: startDate,
-                                                    intervalComponents: DateComponents(day: 1))
-            
-            query.initialResultsHandler = { query, results, error in
-                guard let results = results else {
-                    print("HealthKit query failed:", error?.localizedDescription ?? "Unknown error")
+    func fetchStepData() {
+        isLoading = true
+        errorMessage = nil
+        let healthStore = HKHealthStore()
+        guard let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
+            errorMessage = "Step Count Type is unavailable on this device."
+            isLoading = false
+            return
+        }
+
+        healthStore.getRequestStatusForAuthorization(toShare: [], read: [stepCountType]) { (status, error) in
+            DispatchQueue.main.async {
+                if let error = error {
+                     self.errorMessage = "Could not check HealthKit authorization status."
+                     self.isLoading = false
+                     return
+                }
+
+                guard status == .unnecessary else {
+                    self.errorMessage = "Please grant HealthKit access in Settings > Health > Data Access & Devices."
+                    self.isLoading = false
                     return
                 }
-                
-                var tempData: [(String, Double)] = []
-                results.enumerateStatistics(from: startDate, to: now) { statistics, _ in
-                    if let quantity = statistics.sumQuantity() {
-                        // Format the date as "Month Day" (e.g., "Dec 08")
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "MMM dd"
-                        let dateString = dateFormatter.string(from: statistics.startDate)
-                        
-                        let steps = quantity.doubleValue(for: HKUnit.count())
-                        tempData.append((dateString, steps))
-                    }
-                }
-                // Update the state with the fetched data
-                DispatchQueue.main.async {
-                    stepData = tempData
-                }
+                performStepQuery(healthStore: healthStore, stepCountType: stepCountType)
             }
-            
-            // Execute the query
-            healthStore.execute(query)
         }
-        func calculateCarbonSaving(for steps: Double) -> Double {
-                    // Example: Assume 1000 steps save 0.2 kg CO2
-                    return steps * 0.2 / 1000
+    }
+
+
+    func performStepQuery(healthStore: HKHealthStore, stepCountType: HKQuantityType) {
+        let calendar = Calendar.current
+        let now = Date()
+        guard let anchorDate = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: now),
+              let startDate = calendar.date(byAdding: .day, value: -7, to: anchorDate) else {
+            errorMessage = "Could not calculate date range for query."
+            isLoading = false
+            return
+        }
+        let endDate = calendar.date(byAdding: .day, value: 1, to: anchorDate) ?? now
+
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+
+        let query = HKStatisticsCollectionQuery(
+            quantityType: stepCountType,
+            quantitySamplePredicate: predicate,
+            options: .cumulativeSum,
+            anchorDate: startDate,
+            intervalComponents: DateComponents(day: 1)
+        )
+
+        query.initialResultsHandler = { query, results, error in
+            DispatchQueue.main.async {
+                guard let results = results else {
+                    self.errorMessage = "Failed to fetch step data. \(error?.localizedDescription ?? "")"
+                    self.isLoading = false
+                    return
                 }
-        
+
+                var tempData: [ChartDataPoint] = []
+                results.enumerateStatistics(from: startDate, to: endDate) { statistics, stop in
+                    let steps = statistics.sumQuantity()?.doubleValue(for: HKUnit.count()) ?? 0
+                    tempData.append(ChartDataPoint(date: statistics.startDate, value: steps))
+                }
+
+                 let finalData = Array(tempData.suffix(7))
+
+                self.stepData = finalData
+                self.isLoading = false
+            }
+        }
+        healthStore.execute(query)
+    }
+
+    func calculateCarbonSaving(for steps: Double) -> Double {
+        return steps * carbonFactor
+    }
+}
+
+class ChartStepsViewController: UIViewController {
+
+    var hostingController: UIHostingController<ContentView>?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+
+        authorizeHealthKit { [weak self] success in
+            guard let self = self else { return }
+            if success {
+                self.setupSwiftUIView()
+            } else {
+                self.showAuthorizationError()
+            }
+        }
+    }
+
+    func setupSwiftUIView() {
+        DispatchQueue.main.async {
+            let contentView = ContentView()
+            self.hostingController = UIHostingController(rootView: contentView)
+
+            guard let hcView = self.hostingController?.view else { return }
+
+            self.addChild(self.hostingController!)
+            self.view.addSubview(hcView)
+            self.hostingController!.didMove(toParent: self)
+
+            hcView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                hcView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+                hcView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+                hcView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+                hcView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+            ])
+        }
+    }
+
+    func showAuthorizationError() {
+         DispatchQueue.main.async {
+            let errorLabel = UILabel()
+            errorLabel.text = "HealthKit Authorization Failed. Please enable access in Settings."
+            errorLabel.textAlignment = .center
+            errorLabel.numberOfLines = 0
+            errorLabel.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(errorLabel)
+
+            NSLayoutConstraint.activate([
+                errorLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+                errorLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                errorLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20),
+                errorLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20)
+            ])
+         }
+    }
+
+    func authorizeHealthKit(completion: @escaping (Bool) -> Void) {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            completion(false)
+            return
         }
 
+        let healthStore = HKHealthStore()
+        guard let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
+             completion(false)
+             return
+        }
+
+        healthStore.getRequestStatusForAuthorization(toShare: [], read: [stepCountType]) { (status, error) in
+            if let error = error {
+                completion(false)
+                return
+            }
+
+            if status == .unnecessary {
+                 completion(true)
+            } else {
+                healthStore.requestAuthorization(toShare: [], read: [stepCountType]) { (success, error) in
+                    completion(success)
+                }
+            }
+        }
+    }
 }
