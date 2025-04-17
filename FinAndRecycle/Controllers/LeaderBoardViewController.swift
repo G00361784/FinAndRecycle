@@ -16,89 +16,137 @@ class LeaderBoardViewController: UIViewController, UITableViewDataSource  {
     @IBOutlet weak var tableView: UITableView!
     
     @IBAction func ClaimRewardsAction(_ sender: Any) {
-        if Auth.auth().currentUser == nil {
-            showLoginWarning()
-        } else {
-            // Handle reward claim logic
-            print("Reward claimed successfully!")
-        }}
-    
-        var ref: DatabaseReference!
-        var players: [[String: Any]] = []
-        
-        override func viewDidLoad() {
-            super.viewDidLoad()
-            tableView.register(UITableViewCell.self, forCellReuseIdentifier: "playerCell")
-            tableView.dataSource = self
-            ref = Database.database().reference()
-            if Auth.auth().currentUser == nil {
-                    showLoginWarning()
+            guard let currentUser = Auth.auth().currentUser else {
+                showLoginWarning()
+                return
+            }
+
+            let userID = currentUser.uid
+            let userRef = ref.child("users").child(userID)
+
+            let updateData = ["rewardsClaimed": true]
+
+            userRef.updateChildValues(updateData) { (error, dbRef) in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        print("Error updating rewards status: \(error.localizedDescription)")
+                        let errorAlert = UIAlertController(title: "Error", message: "Could not claim rewards. Please try again. (\(error.localizedDescription))", preferredStyle: .alert)
+                        errorAlert.addAction(UIAlertAction(title: "OK", style: .default))
+                        self.present(errorAlert, animated: true)
+                    } else {
+                        print("Successfully updated rewardsClaimed status for user \(userID)")
+                        let claimAlert = UIAlertController(title: "Rewards", message: "Rewards claimed!", preferredStyle: .alert)
+                        claimAlert.addAction(UIAlertAction(title: "OK", style: .default))
+                        self.present(claimAlert, animated: true)
+                    }
                 }
-            fetchLeaderboardData() // Always load leaderboard
-        }
-
-        // Button action to check user login (optional for rewards)
-        @IBAction func checkUserLogin(_ sender: UIButton) {
-            if Auth.auth().currentUser == nil {
-                showLoginWarning() // Shows a warning but does NOT block leaderboard
             }
         }
+           var ref: DatabaseReference!
+           var leaderboardUsers: [[String: Any]] = []
 
-        // Show an alert if the user is not logged in (only a warning)
-        func showLoginWarning() {
-            let alert = UIAlertController(title: "Limited Access",
-                                          message: "You can view the leaderboard, but some features may be restricted until you log in.",
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            alert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
-                self.redirectToLogin()
-            }))
-            present(alert, animated: true, completion: nil)
-        }
+           override func viewDidLoad() {
+               super.viewDidLoad()
+               tableView.register(UITableViewCell.self, forCellReuseIdentifier: "userCell")
+               tableView.dataSource = self
+               ref = Database.database().reference()
 
-        // Redirect user to login screen
-        func redirectToLogin() {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            if let loginVC = storyboard.instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
-                loginVC.modalPresentationStyle = .fullScreen
-                present(loginVC, animated: true, completion: nil)
-            }
-        }
+               if Auth.auth().currentUser == nil {
+                   print("User not logged in. Some features might be disabled.")
+               }
+               fetchLeaderboardData()
+           }
 
-        // Fetch leaderboard data for everyone
-        func fetchLeaderboardData() {
-            ref.child("playerinfo").observeSingleEvent(of: .value, with: { (snapshot) in
-                guard let value = snapshot.value as? [String: [String: Any]] else { return }
+           @IBAction func checkUserLogin(_ sender: UIButton) {
+               if Auth.auth().currentUser == nil {
+                   showLoginWarning()
+               } else {
+                    let loggedInAlert = UIAlertController(title: "Logged In", message: "You are logged in.", preferredStyle: .alert)
+                    loggedInAlert.addAction(UIAlertAction(title: "OK", style: .default))
+                    present(loggedInAlert, animated: true)
+               }
+           }
 
-                self.players = value.values.sorted { (player1, player2) -> Bool in
-                    let score1 = player1["score"] as? Int ?? 0
-                    let score2 = player2["score"] as? Int ?? 0
-                    return score1 > score2
-                }
+           func showLoginWarning() {
+               let alert = UIAlertController(title: "Login Required",
+                                             message: "You need to be logged in to claim rewards.",
+                                             preferredStyle: .alert)
+               alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+               alert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
+                   self.redirectToLogin()
+               }))
+               present(alert, animated: true, completion: nil)
+           }
 
-                self.tableView.reloadData()
-            }) { (error) in
-                print(error.localizedDescription)
-            }
-        }
+           func redirectToLogin() {
+               let storyboard = UIStoryboard(name: "Main", bundle: nil)
+               if let loginVC = storyboard.instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
+                   loginVC.modalPresentationStyle = .fullScreen
+                   present(loginVC, animated: true, completion: nil)
+               } else {
+                    print("Error: Could not instantiate LoginViewController from Storyboard.")
+               }
+           }
 
-        // MARK: - UITableViewDataSource
+           func fetchLeaderboardData() {
+               ref.child("users").observeSingleEvent(of: .value, with: { (snapshot) in
+                   guard let usersData = snapshot.value as? [String: [String: Any]] else {
+                        print("Could not fetch or parse users data.")
+                        self.leaderboardUsers = []
+                        self.tableView.reloadData()
+                        return
+                   }
 
-        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            return players.count
-        }
+                   let usersWithScores = usersData.values.filter { userData in
+                       if let score = userData["score"] {
+                           return score is Int || score is Double || score is String
+                       }
+                       return false
+                   }
 
-        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "playerCell", for: indexPath)
-            let player = players[indexPath.row]
+                   self.leaderboardUsers = usersWithScores.sorted { (user1Data, user2Data) -> Bool in
+                       let score1 = self.extractScore(from: user1Data["score"])
+                       let score2 = self.extractScore(from: user2Data["score"])
+                       return score1 > score2
+                   }
 
-            let name = player["name"] as? String ?? "Unknown"
-            let age = player["age"] as? Int ?? 0
-            let score = player["score"] as? Int ?? 0
+                   DispatchQueue.main.async {
+                       self.tableView.reloadData()
+                   }
+               }) { (error) in
+                   print("Firebase Database error: \(error.localizedDescription)")
+                    self.leaderboardUsers = []
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+               }
+           }
 
-            cell.textLabel?.text = "\(name) - Age: \(age) - Score: \(score)"
+           private func extractScore(from value: Any?) -> Int {
+               if let intScore = value as? Int {
+                   return intScore
+               } else if let doubleScore = value as? Double {
+                   return Int(doubleScore)
+               } else if let stringScore = value as? String, let intScore = Int(stringScore) {
+                    return intScore
+               }
+               return 0
+           }
 
-            return cell
-        }
+           func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+               return leaderboardUsers.count
+           }
 
-    }
+           func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+               let cell = tableView.dequeueReusableCell(withIdentifier: "userCell", for: indexPath)
+               let userData = leaderboardUsers[indexPath.row]
+
+               let email = userData["email"] as? String ?? "No Email"
+               let score = extractScore(from: userData["score"])
+
+               cell.textLabel?.text = "\(indexPath.row + 1). \(email) - Score: \(score)"
+               cell.textLabel?.numberOfLines = 0
+
+               return cell
+           }
+       }

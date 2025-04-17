@@ -40,15 +40,6 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0zq-eH-neP">
-                                <rect key="frame" x="307" y="103" width="66" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Login"/>
-                                <connections>
-                                    <segue destination="fCl-5B-xOO" kind="show" id="UTy-0a-OaB"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="News Feed:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ih9-bp-ecq">
                                 <rect key="frame" x="27" y="304" width="328" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -184,7 +175,7 @@
             <objects>
                 <viewController id="fCl-5B-xOO" customClass="LoginViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="pzU-hg-uqo">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RxH-67-2SR">
@@ -262,7 +253,7 @@
             <objects>
                 <viewController id="rtK-Cy-sux" customClass="RegisterViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="XdC-O2-AUH">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Dcg-bT-sZq">
@@ -297,8 +288,8 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Register"/>
                                 <connections>
-                                    <action selector="RegisterPressed:" destination="rtK-Cy-sux" eventType="touchUpInside" id="GG7-dV-5gK"/>
-                                    <segue destination="BYZ-38-t0r" kind="show" identifier="toHomeScreenFromR" id="pPz-fs-fBn"/>
+                                    <action selector="RegisterPressed:" destination="rtK-Cy-sux" eventType="touchUpInside" id="59e-Lv-TJp"/>
+                                    <segue destination="xqB-HD-61M" kind="show" identifier="toHomeScreenFromR" id="Zse-eh-vSt"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -320,7 +311,7 @@
             <objects>
                 <viewController id="xqB-HD-61M" customClass="LeaderBoardViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="aqX-tW-j5I">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bFu-Mz-0Ut">
@@ -369,7 +360,7 @@
                                 <buttonConfiguration key="configuration" style="gray" title="Claim In Game Rewards"/>
                                 <connections>
                                     <action selector="ClaimRewardsAction:" destination="xqB-HD-61M" eventType="touchUpInside" id="R52-X3-UWe"/>
-                                    <segue destination="2O7-e3-Vem" kind="show" id="XQl-ju-42d"/>
+                                    <segue destination="fCl-5B-xOO" kind="show" id="svk-vK-fSd"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -388,6 +379,7 @@
         <!--View Controller-->
         <scene sceneID="LXy-u2-9L3">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkg-Hm-UE8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <viewController id="2O7-e3-Vem" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ipQ-PB-f0z">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
@@ -397,9 +389,8 @@
                     </view>
                     <navigationItem key="navigationItem" id="I03-CU-c24"/>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkg-Hm-UE8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3460.3053435114502" y="1030.9859154929577"/>
+            <point key="canvasLocation" x="3433" y="1342"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="U4k-uq-rqj">
@@ -527,6 +518,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
+        <segue reference="Zse-eh-vSt"/>
         <segue reference="SF1-mb-dXy"/>
     </inferredMetricsTieBreakers>
     <resources>
