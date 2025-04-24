@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="EIo-EN-KOq">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="EIo-EN-KOq">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -20,7 +20,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="KE6-nf-aXt">
-                                <rect key="frame" x="0.0" y="324" width="393" height="472"/>
+                                <rect key="frame" x="0.0" y="324" width="393" height="528"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="oXC-An-7ul">
@@ -54,6 +54,10 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Fin and Recycle" translatesAutoresizingMaskIntoConstraints="NO" id="WhA-xg-6AD">
+                                <rect key="frame" x="-24" y="17" width="165" height="75"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -65,14 +69,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2881.679389312977" y="3.5211267605633805"/>
+            <point key="canvasLocation" x="2809.9236641221373" y="3.5211267605633805"/>
         </scene>
         <!--Chart Steps View Controller-->
         <scene sceneID="GVL-VI-8f6">
             <objects>
                 <viewController id="AcI-6J-2kc" customClass="ChartStepsViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="iKo-um-b7e">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="dCg-AG-DKG"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -81,7 +85,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bYi-IB-I2c" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-111" y="1082"/>
+            <point key="canvasLocation" x="-440" y="812"/>
         </scene>
         <!--Travel-->
         <scene sceneID="0dU-bS-e02">
@@ -100,8 +104,8 @@
                                     <segue destination="AcI-6J-2kc" kind="show" id="gdo-dL-BdK"/>
                                 </connections>
                             </button>
-                            <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="wo2-RT-dhL">
-                                <rect key="frame" x="112" y="277" width="225" height="94"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="wo2-RT-dhL">
+                                <rect key="frame" x="84" y="431" width="225" height="94"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Daily Log" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eYc-KS-FTP">
                                         <rect key="frame" x="0.0" y="0.0" width="225" height="20.333333333333332"/>
@@ -168,18 +172,18 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="E1s-Js-vPF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="600.76335877862596" y="767.6056338028169"/>
+            <point key="canvasLocation" x="595" y="812"/>
         </scene>
         <!--Login View Controller-->
         <scene sceneID="BW0-qb-xEv">
             <objects>
                 <viewController id="fCl-5B-xOO" customClass="LoginViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="pzU-hg-uqo">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RxH-67-2SR">
-                                <rect key="frame" x="153" y="649" width="87" height="22"/>
+                                <rect key="frame" x="153" y="642" width="87" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Register"/>
@@ -230,12 +234,12 @@
                                 <buttonConfiguration key="configuration" style="tinted" title="Login"/>
                                 <connections>
                                     <action selector="loginPressed:" destination="fCl-5B-xOO" eventType="touchUpInside" id="way-Th-1vi"/>
-                                    <segue destination="BYZ-38-t0r" kind="show" identifier="toHomeScreenFromL" id="CBu-YU-XGl"/>
+                                    <segue destination="xqB-HD-61M" kind="show" id="Xv6-0g-WGE"/>
                                 </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="0xw-zt-5ih"/>
-                        <color key="backgroundColor" systemColor="systemIndigoColor"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <navigationItem key="navigationItem" id="Kgw-Nv-C2x"/>
                     <connections>
@@ -246,14 +250,14 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mt2-cx-88p" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="d9x-UD-afH" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="4652.6717557251905" y="5.6338028169014089"/>
+            <point key="canvasLocation" x="3719.8473282442746" y="811.97183098591552"/>
         </scene>
         <!--Register View Controller-->
         <scene sceneID="21i-N5-xCj">
             <objects>
                 <viewController id="rtK-Cy-sux" customClass="RegisterViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="XdC-O2-AUH">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Dcg-bT-sZq">
@@ -304,14 +308,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="G6w-WS-fmv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4181" y="639"/>
+            <point key="canvasLocation" x="4792" y="812"/>
         </scene>
         <!--Leader Board View Controller-->
         <scene sceneID="RE2-hf-VPN">
             <objects>
                 <viewController id="xqB-HD-61M" customClass="LeaderBoardViewController" customModule="FinAndRecycle" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="aqX-tW-j5I">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bFu-Mz-0Ut">
@@ -375,22 +379,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8NV-Xd-s45" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2724.4274809160306" y="811.97183098591552"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="LXy-u2-9L3">
-            <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkg-Hm-UE8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <viewController id="2O7-e3-Vem" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="ipQ-PB-f0z">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="PD7-2J-ZGV"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="I03-CU-c24"/>
-                </viewController>
-            </objects>
-            <point key="canvasLocation" x="3433" y="1342"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="U4k-uq-rqj">
@@ -485,7 +473,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="LEv-ao-f2I"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="AHB-Yh-14K">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -504,7 +492,7 @@
                     <tabBarItem key="tabBarItem" title="Game" image="gamecontroller" catalog="system" selectedImage="gamecontroller" id="kFc-7i-c3r"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="o2t-jz-COn">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -518,10 +506,10 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="Zse-eh-vSt"/>
-        <segue reference="SF1-mb-dXy"/>
+        <segue reference="Xv6-0g-WGE"/>
     </inferredMetricsTieBreakers>
     <resources>
+        <image name="Fin and Recycle" width="1024" height="1024"/>
         <image name="figure.walk" catalog="system" width="94" height="128"/>
         <image name="gamecontroller" catalog="system" width="128" height="79"/>
         <image name="house" catalog="system" width="128" height="104"/>
@@ -529,9 +517,6 @@
         <image name="map" catalog="system" width="128" height="112"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemIndigoColor">
-            <color red="0.34509803919999998" green="0.33725490200000002" blue="0.83921568629999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
