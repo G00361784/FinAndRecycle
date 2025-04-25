@@ -3,6 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>NSHealthShareUsageDescription</key>
+	<string>Share Health Data with us?</string>
+	<key>NSMotionUsageDescription</key>
 	<string>Share Health Data With Us?</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

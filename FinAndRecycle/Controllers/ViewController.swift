@@ -1,17 +1,20 @@
 import UIKit
 import Foundation
-
+import CoreMotion
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
     @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var stepCountLabel: UILabel!
     @IBOutlet weak var collectionView: UICollectionView!
 
         // Stores fetched news articles
         var articles: [Article] = []
         
+    let pedometer = CMPedometer()
+
+    
         // API key for accessing the News API - Remember to keep API keys secure in real apps!
-        private let apiKey = "f869c8bcd91543ac9b9689504470c0be" // Replace with your actual API key if needed
-        
+        private let apiKey = "f869c8bcd91543ac9b9689504470c0be"
         // Struct representing the JSON response from the News API
         struct NewsResponse: Codable {
             let articles: [Article] // Array of articles
@@ -31,6 +34,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             super.viewDidLoad()
             view.backgroundColor = .systemBackground
             title = "News Feed"
+            
+            stepCountLabel.text = "Checking..." // Initial text
+            requestAuthorizationAndQuerySteps()
+            
             
             // Ensure collectionView is connected in Storyboard or create programmatically
             if collectionView == nil {
@@ -485,4 +492,135 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
                 }
             }
         }
-    } // End of ViewController class
+    
+    func requestAuthorizationAndQuerySteps() {
+            // 1. Check if step counting is available on this device
+            guard CMPedometer.isStepCountingAvailable() else {
+                print("Step counting is not available on this device.")
+                DispatchQueue.main.async {
+                    self.stepCountLabel.text = "Steps N/A"
+                }
+                return
+            }
+
+            // 2. Check current authorization status
+            let authorizationStatus = CMPedometer.authorizationStatus()
+
+            switch authorizationStatus {
+            case .notDetermined:
+                // Permission hasn't been asked yet. Querying steps will trigger the request.
+                print("Permission not determined. Querying steps will request authorization.")
+                queryTodaysSteps()
+            case .authorized:
+                // Permission already granted.
+                print("Permission authorized.")
+                queryTodaysSteps()
+            case .denied, .restricted:
+                // Permission denied or restricted by parental controls.
+                print("Permission denied or restricted.")
+                DispatchQueue.main.async {
+                    self.stepCountLabel.text = "Permission Denied"
+                    // Optionally, guide the user to Settings
+                    self.showSettingsAlert()
+                }
+            @unknown default:
+                print("Unknown authorization status.")
+                DispatchQueue.main.async {
+                    self.stepCountLabel.text = "Error"
+                }
+            }
+        }
+
+        func queryTodaysSteps() {
+            // Define the time range for today's steps
+            let calendar = Calendar.current
+            let now = Date()
+            let startOfDay = calendar.startOfDay(for: now) // Gets 12:00 AM today
+
+            print("Querying steps from \(startOfDay) to \(now)")
+
+            // Query the pedometer for step data
+            pedometer.queryPedometerData(from: startOfDay, to: now) { [weak self] (pedometerData, error) in
+                // Ensure execution is on the main thread for UI updates
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+
+                    // 3. Handle errors
+                    if let error = error {
+                        print("Error querying pedometer data: \(error.localizedDescription)")
+                        self.stepCountLabel.text = "Error Fetching"
+                        // Check if the error is due to authorization after the initial check
+                        if (error as NSError).domain == CMErrorDomain && (error as NSError).code == CMErrorMotionActivityNotAuthorized.rawValue {
+                             print("Authorization was denied during query.")
+                             self.stepCountLabel.text = "Permission Denied"
+                             self.showSettingsAlert()
+                        }
+                        return
+                    }
+
+                    // 4. Handle the pedometer data
+                    if let data = pedometerData {
+                        let steps = data.numberOfSteps.intValue
+                        print("Successfully fetched steps: \(steps)")
+                        self.stepCountLabel.text = "\(steps) Steps Today"
+                    } else {
+                        print("Pedometer data was nil, but no error.")
+                        self.stepCountLabel.text = "No Data"
+                    }
+                }
+            }
+        }
+
+        // Helper function to guide user to Settings if permission denied
+        func showSettingsAlert() {
+             DispatchQueue.main.async { // Ensure UI updates are on the main thread
+                let alert = UIAlertController(
+                    title: "Permission Required",
+                    message: "This app needs permission to access motion data to count steps. Please grant permission in Settings.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                alert.addAction(UIAlertAction(title: "Settings", style: .default) { _ in
+                    // Open app settings
+                    if let url = URL(string: UIApplication.openSettingsURLString), UIApplication.shared.canOpenURL(url) {
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    }
+                })
+                self.present(alert, animated: true)
+            }
+        }
+
+        // --- Example of fetching historical data (e.g., last 7 days) ---
+        func queryLastSevenDaysSteps() {
+            let calendar = Calendar.current
+            let endDate = Date() // Today
+            guard let startDate = calendar.date(byAdding: .day, value: -7, to: endDate) else {
+                 print("Error calculating start date")
+                 return
+            }
+
+             print("Querying steps from \(startDate) to \(endDate)")
+
+             pedometer.queryPedometerData(from: startDate, to: endDate) { pedometerData, error in
+                 DispatchQueue.main.async {
+                     if let error = error {
+                         print("Error querying last 7 days steps: \(error.localizedDescription)")
+                         // Handle error appropriately
+                         return
+                     }
+                     if let data = pedometerData {
+                         let totalSteps = data.numberOfSteps.intValue
+                         print("Total steps in the last 7 days: \(totalSteps)")
+                         // Update UI or store data as needed
+                         // self.stepCountLabel.text = "\(totalSteps) Steps (7 Days)"
+                     }
+                 }
+             }
+        }
+    }
+
+    
+    
+    
+    
+    // End of ViewController class

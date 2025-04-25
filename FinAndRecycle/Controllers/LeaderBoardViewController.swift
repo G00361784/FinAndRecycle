@@ -34,10 +34,7 @@ class LeaderBoardViewController: UIViewController, UITableViewDataSource  {
                         errorAlert.addAction(UIAlertAction(title: "OK", style: .default))
                         self.present(errorAlert, animated: true)
                     } else {
-                        print("Successfully updated rewardsClaimed status for user \(userID)")
-                        let claimAlert = UIAlertController(title: "Rewards", message: "Rewards claimed!", preferredStyle: .alert)
-                        claimAlert.addAction(UIAlertAction(title: "OK", style: .default))
-                        self.present(claimAlert, animated: true)
+                       
                     }
                 }
             }
