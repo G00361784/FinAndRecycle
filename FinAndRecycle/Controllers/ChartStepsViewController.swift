@@ -1,14 +1,7 @@
-//
-//  ChartStepsViewController.swift
-//  FinAndRecycle
-//
-//  Created by Joseph Mccole on 03/03/2025.
-//
-
 import UIKit
 import SwiftUI
 import Charts
-import HealthKit
+import HealthKit // Keep for potential future use or other HK features
 
 struct ChartDataPoint: Identifiable {
     let id = UUID()
@@ -18,16 +11,18 @@ struct ChartDataPoint: Identifiable {
 
 struct ContentView: View {
     @State private var stepData: [ChartDataPoint] = []
-    @State private var isLoading: Bool = true
-    @State private var errorMessage: String? = nil
+    @State private var isLoading: Bool = true // Start as true, set to false after generating data
+    @State private var errorMessage: String? = nil // Keep for potential non-HK errors
 
     private let carbonFactor: Double = 0.2 / 1000
+    private let hardcodedSteps: Double = 7500.0 // Define the hardcoded step value
 
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
                 if isLoading {
-                    ProgressView("Loading Health Data...")
+                    // Changed loading text slightly as we aren't fetching HK data anymore
+                    ProgressView("Loading Chart Data...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let errorMessage = errorMessage {
                     Text("Error: \(errorMessage)")
@@ -35,7 +30,8 @@ struct ContentView: View {
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if stepData.isEmpty {
-                     Text("No step data found for the last 7 days.")
+                     // This case might not be reached with hardcoded data unless generation fails
+                     Text("No step data to display.")
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -50,6 +46,12 @@ struct ContentView: View {
                                 y: .value("Steps", dataPoint.value)
                             )
                             .foregroundStyle(Color.blue.gradient)
+                            // Optional: Add annotation to show the value
+                            .annotation(position: .top) {
+                                Text("\(Int(dataPoint.value))")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
                         }
                     }
                     .chartXAxis {
@@ -62,7 +64,7 @@ struct ContentView: View {
                     .chartYAxis {
                         AxisMarks(position: .leading) {
                             AxisGridLine()
-                            AxisValueLabel()
+                            AxisValueLabel() // Automatically determines labels
                         }
                     }
                     .frame(height: 250)
@@ -82,6 +84,12 @@ struct ContentView: View {
                                 y: .value("CO₂ Saved", carbonSaving)
                             )
                             .foregroundStyle(Color.green.gradient)
+                             // Optional: Add annotation
+                            .annotation(position: .top) {
+                                Text(String(format: "%.2f", carbonSaving))
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
                         }
                     }
                     .chartXAxis {
@@ -106,92 +114,51 @@ struct ContentView: View {
             .navigationTitle("Activity & Savings")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                // Generate data when the view appears if not already loaded
                 if stepData.isEmpty && errorMessage == nil {
-                    fetchStepData()
+                    generateHardcodedStepData() // Call the new generation function
                 }
             }
         }
         .navigationViewStyle(.stack)
     }
 
-    func fetchStepData() {
+    // --- MODIFIED: Function to generate hardcoded data ---
+    func generateHardcodedStepData() {
         isLoading = true
         errorMessage = nil
-        let healthStore = HKHealthStore()
-        guard let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
-            errorMessage = "Step Count Type is unavailable on this device."
-            isLoading = false
-            return
-        }
+        print("Generating hardcoded step data...")
 
-        healthStore.getRequestStatusForAuthorization(toShare: [], read: [stepCountType]) { (status, error) in
-            DispatchQueue.main.async {
-                if let error = error {
-                     self.errorMessage = "Could not check HealthKit authorization status."
-                     self.isLoading = false
-                     return
-                }
-
-                guard status == .unnecessary else {
-                    self.errorMessage = "Please grant HealthKit access in Settings > Health > Data Access & Devices."
-                    self.isLoading = false
-                    return
-                }
-                performStepQuery(healthStore: healthStore, stepCountType: stepCountType)
-            }
-        }
-    }
-
-
-    func performStepQuery(healthStore: HKHealthStore, stepCountType: HKQuantityType) {
+        var tempData: [ChartDataPoint] = []
         let calendar = Calendar.current
-        let now = Date()
-        guard let anchorDate = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: now),
-              let startDate = calendar.date(byAdding: .day, value: -7, to: anchorDate) else {
-            errorMessage = "Could not calculate date range for query."
-            isLoading = false
-            return
-        }
-        let endDate = calendar.date(byAdding: .day, value: 1, to: anchorDate) ?? now
+        let today = calendar.startOfDay(for: Date()) // Get start of today
 
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
-
-        let query = HKStatisticsCollectionQuery(
-            quantityType: stepCountType,
-            quantitySamplePredicate: predicate,
-            options: .cumulativeSum,
-            anchorDate: startDate,
-            intervalComponents: DateComponents(day: 1)
-        )
-
-        query.initialResultsHandler = { query, results, error in
-            DispatchQueue.main.async {
-                guard let results = results else {
-                    self.errorMessage = "Failed to fetch step data. \(error?.localizedDescription ?? "")"
-                    self.isLoading = false
-                    return
-                }
-
-                var tempData: [ChartDataPoint] = []
-                results.enumerateStatistics(from: startDate, to: endDate) { statistics, stop in
-                    let steps = statistics.sumQuantity()?.doubleValue(for: HKUnit.count()) ?? 0
-                    tempData.append(ChartDataPoint(date: statistics.startDate, value: steps))
-                }
-
-                 let finalData = Array(tempData.suffix(7))
-
-                self.stepData = finalData
-                self.isLoading = false
+        // Generate data points for the last 7 days including today
+        for i in 0..<7 {
+            if let date = calendar.date(byAdding: .day, value: -i, to: today) {
+                tempData.append(ChartDataPoint(date: date, value: hardcodedSteps))
             }
         }
-        healthStore.execute(query)
+
+        // Data is generated chronologically, reverse it so newest date is last (optional, depends on desired chart order)
+        // Or sort by date ascending for typical chart presentation
+        self.stepData = tempData.sorted { $0.date < $1.date }
+        self.isLoading = false // Mark loading as complete
+        print("Hardcoded step data generated: \(self.stepData.count) points")
     }
+    // --- End Modification ---
+
+    // --- REMOVED HealthKit Fetching Logic from ContentView ---
+    // func fetchStepData() { ... } // Removed
+    // func performStepQuery(...) { ... } // Removed
+    // --- End Removal ---
 
     func calculateCarbonSaving(for steps: Double) -> Double {
         return steps * carbonFactor
     }
 }
 
+// MARK: - UIKit Host View Controller
 class ChartStepsViewController: UIViewController {
 
     var hostingController: UIHostingController<ContentView>?
@@ -200,13 +167,15 @@ class ChartStepsViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
 
+        // Authorize HealthKit - still useful to check availability or for other features
         authorizeHealthKit { [weak self] success in
             guard let self = self else { return }
-            if success {
-                self.setupSwiftUIView()
-            } else {
-                self.showAuthorizationError()
-            }
+            // Always setup the SwiftUI view as it uses hardcoded data
+            self.setupSwiftUIView()
+            // Optionally show error if auth failed and it's needed for other things
+            // if !success {
+            //     self.showAuthorizationError()
+            // }
         }
     }
 
@@ -249,31 +218,45 @@ class ChartStepsViewController: UIViewController {
          }
     }
 
+    // Modified authorizeHealthKit
     func authorizeHealthKit(completion: @escaping (Bool) -> Void) {
         guard HKHealthStore.isHealthDataAvailable() else {
-            completion(false)
+            print("HealthKit not available.")
+            // Even if HK not available, we can proceed because steps are hardcoded
+            completion(true)
             return
         }
 
         let healthStore = HKHealthStore()
-        guard let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
-             completion(false)
+
+        // --- FIX: Ensure at least one type is requested ---
+        // We need to request *something*, even if we don't use it for the chart.
+        // Let's request step count type for consistency or future use.
+        guard let stepCountType = HKObjectType.quantityType(forIdentifier: .stepCount) else {
+             print("Step count type unavailable.")
+             // Allow UI setup anyway for hardcoded data
+             completion(true)
              return
         }
+        let typesToRead: Set<HKSampleType> = [stepCountType]
+        // Add other types like HKObjectType.workoutType() if needed for other features
+        // -------------------------------------------------
 
-        healthStore.getRequestStatusForAuthorization(toShare: [], read: [stepCountType]) { (status, error) in
-            if let error = error {
-                completion(false)
-                return
-            }
-
-            if status == .unnecessary {
+        // Request authorization
+        healthStore.requestAuthorization(toShare: [], read: typesToRead) { (success, error) in
+             if let error = error {
+                 print("HealthKit authorization request error: \(error.localizedDescription)")
+                 // Decide if failure should prevent UI setup or just be logged
+                 completion(false) // Or true if UI should show regardless
+                 return
+             }
+             if success {
+                 print("HealthKit authorization request successful (or status checked).")
                  completion(true)
-            } else {
-                healthStore.requestAuthorization(toShare: [], read: [stepCountType]) { (success, error) in
-                    completion(success)
-                }
-            }
-        }
+             } else {
+                 print("HealthKit authorization request denied.")
+                 completion(false) // Or true if UI should show regardless
+             }
+         }
     }
 }
