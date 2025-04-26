@@ -50,7 +50,7 @@ class WorkoutLogCell: UITableViewCell {
 
 
 
-class PersonalLogViewController: UIViewController,UITableViewDataSource {
+class PersonalLogViewController: UIViewController,UITableViewDataSource, UITableViewDelegate{
 
     
     
@@ -61,6 +61,10 @@ class PersonalLogViewController: UIViewController,UITableViewDataSource {
     @IBOutlet weak var co2SavingsLabel: UILabel!
     
     @IBOutlet weak var workoutTableView: UITableView!
+    
+    
+    private let averageCarEmissionFactorGramsPerKM: Double = 135.0
+
     
     // --- HealthKit ---
      private let healthStore = HKHealthStore()
@@ -95,9 +99,9 @@ class PersonalLogViewController: UIViewController,UITableViewDataSource {
 
          // Configure the workout table view
          workoutTableView.dataSource = self
-         // Optional: Set estimated row height for better performance
-         workoutTableView.estimatedRowHeight = 60
-         workoutTableView.rowHeight = UITableView.automaticDimension
+        workoutTableView.delegate = self // <<<< SET THE DELEGATE
+        workoutTableView.estimatedRowHeight = 60
+        workoutTableView.rowHeight = UITableView.automaticDimension
 
          // Start the process to get HealthKit data (still need workout permission)
          Task {
@@ -105,6 +109,16 @@ class PersonalLogViewController: UIViewController,UITableViewDataSource {
          }
      }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
      // --- UI Setup ---
      private func setupInitialUI() {
          dateLabel.text = dateFormatter.string(from: Date())
@@ -185,39 +199,42 @@ class PersonalLogViewController: UIViewController,UITableViewDataSource {
      }
 
      // --- Function to add a hardcoded workout ---
-     private func addHardcodedRunningWorkout() {
-         print("Adding hardcoded running workout...")
-         // Create sample dates (e.g., today at 9:00 AM for 30 mins)
-         let calendar = Calendar.current
-         var components = calendar.dateComponents([.year, .month, .day], from: Date())
-         components.hour = 9
-         components.minute = 0
-         guard let startDate = calendar.date(from: components),
-               let endDate = calendar.date(byAdding: .minute, value: 30, to: startDate) else {
-             print("Error creating hardcoded dates.")
-             return
-         }
+    // --- Function to add a hardcoded workout ---
+    private func addHardcodedRunningWorkout() {
+        print("Adding hardcoded running workout...")
+        // Create sample dates (e.g., today at 9:00 AM for 30 mins)
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+        components.hour = 9
+        components.minute = 0
+        guard let startDate = calendar.date(from: components),
+              let endDate = calendar.date(byAdding: .minute, value: 30, to: startDate) else {
+            print("Error creating hardcoded dates.")
+            return
+        }
 
-         // Create sample quantities (optional)
-         let energyBurned = HKQuantity(unit: .kilocalorie(), doubleValue: 250.0)
-         let distance = HKQuantity(unit: .meter(), doubleValue: 3500.0)
+        // Create sample quantities (optional)
+        let energyBurned = HKQuantity(unit: .kilocalorie(), doubleValue: 250.0)
+        // FIX: Use HKUnit.meter() here
+        let distance = HKQuantity(unit: HKUnit.meter(), doubleValue: 3500.0)
 
-         // Create the hardcoded workout
-         let hardcodedWorkout = HKWorkout(
-             activityType: .running,
-             start: startDate,
-             end: endDate,
-             duration: endDate.timeIntervalSince(startDate), // Calculate duration
-             totalEnergyBurned: energyBurned,
-             totalDistance: distance,
-             metadata: [HKMetadataKeyWorkoutBrandName: "Hardcoded Example"] // Example metadata
-         )
+        // Create the hardcoded workout
+        let hardcodedWorkout = HKWorkout(
+            activityType: .running,
+            start: startDate,
+            end: endDate,
+            duration: endDate.timeIntervalSince(startDate), // Calculate duration
+            totalEnergyBurned: energyBurned,
+            totalDistance: distance,
+            metadata: [HKMetadataKeyWorkoutBrandName: "Hardcoded Example"] // Example metadata
+        )
 
-         // Append to the workouts array
-         self.workouts.append(hardcodedWorkout)
-     }
-     // -----------------------------------------
-
+        // Append to the workouts array
+        // Ensure modification happens safely if accessed from multiple threads, though likely fine here.
+        // DispatchQueue.main.async { // If updates need to be synced with UI updates
+             self.workouts.append(hardcodedWorkout)
+        // }
+    }
 
      // --- Fetch Steps (MODIFIED TO RETURN HARDCODED VALUE) ---
      private func fetchTodaysSteps() async -> Int? {
@@ -307,14 +324,88 @@ class PersonalLogViewController: UIViewController,UITableViewDataSource {
      }
 
      // MARK: - UITableViewDataSource Methods for Workouts
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Ensure this is the workout table view
+        guard tableView == workoutTableView else { return }
 
-     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-         // Ensure this is only called for the workoutTableView if you have multiple tables
-         if tableView == workoutTableView {
-             return workouts.count
-         }
-         return 0 // Return 0 for any other table view
-     }
+        // Deselect the row visually
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        // Get the selected workout
+        let selectedWorkout = workouts[indexPath.row]
+        let workoutName = selectedWorkout.workoutActivityType.name
+
+        // Check if the workout has distance data AND if the converted distance > 0
+        guard let distanceQuantity = selectedWorkout.totalDistance else {
+            showNoDistanceAlert(for: workoutName)
+            return
+        }
+
+        let distanceInMeters = distanceQuantity.doubleValue(for: .meter())
+
+        guard distanceInMeters > 0 else {
+            showNoDistanceAlert(for: workoutName)
+            return
+        }
+
+        // Ask the user for confirmation
+        let confirmationAlert = UIAlertController(
+            title: "Replace Car Journey?",
+            message: "Did this '\(workoutName)' activity replace a car journey for the distance covered?",
+            preferredStyle: .alert
+        )
+
+        confirmationAlert.addAction(UIAlertAction(title: "Yes", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.calculateAndShowWorkoutCO2Savings(for: selectedWorkout, distanceInMeters: distanceInMeters)
+        })
+
+        confirmationAlert.addAction(UIAlertAction(title: "No", style: .cancel))
+
+        present(confirmationAlert, animated: true)
+    }
+
+    // --- Helper to show an alert for missing distance ---
+    private func showNoDistanceAlert(for workoutName: String) {
+        let noDistanceAlert = UIAlertController(
+            title: "Calculation Not Possible",
+            message: "Cannot calculate CO2 savings for '\(workoutName)' as it lacks valid distance data.",
+            preferredStyle: .alert
+        )
+        noDistanceAlert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(noDistanceAlert, animated: true)
+    }
+
+    // --- Calculation and Display Logic ---
+    private func calculateAndShowWorkoutCO2Savings(for workout: HKWorkout, distanceInMeters: Double) {
+        let distanceInKM = distanceInMeters / 1000.0
+
+        let co2SavedGrams = distanceInKM * averageCarEmissionFactorGramsPerKM
+        let co2SavedKilograms = co2SavedGrams / 1000.0
+
+        let formattedSavings = co2Formatter.string(from: NSNumber(value: co2SavedKilograms)) ?? String(format: "%.2f", co2SavedKilograms)
+        let workoutName = workout.workoutActivityType.name
+        let formattedDistance = String(format: "%.2f km", distanceInKM)
+
+        let resultAlert = UIAlertController(
+            title: "CO₂ Savings Calculated",
+            message: "By choosing \(workoutName) (\(formattedDistance)) instead of driving, you saved approximately \(formattedSavings) kg of CO₂!",
+            preferredStyle: .alert
+        )
+        resultAlert.addAction(UIAlertAction(title: "Great!", style: .default))
+        present(resultAlert, animated: true)
+
+        // Optional: Persist choice (your code for that stays the same)
+    }
+
+    // Your numberOfRowsInSection method is fine and stays the same.
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if tableView == workoutTableView {
+            return workouts.count
+        }
+        return 0
+    }
+
 
      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
           // Ensure this is only called for the workoutTableView
@@ -346,8 +437,8 @@ class PersonalLogViewController: UIViewController,UITableViewDataSource {
  extension HKWorkoutActivityType {
      var name: String {
          // ... (keep the full switch statement from the previous HealthKit example)
-          switch self {
-             case .americanFootball: return "American Football"; case .archery: return "Archery"; case .australianFootball: return "Australian Football"; case .badminton: return "Badminton"; case .baseball: return "Baseball"; case .basketball: return "Basketball"; case .bowling: return "Bowling"; case .boxing: return "Boxing"; case .climbing: return "Climbing"; case .cricket: return "Cricket"; case .crossTraining: return "Cross Training"; case .curling: return "Curling"; case .cycling: return "Cycling"; case .dance: return "Dance"; case .danceInspiredTraining: return "Dance Inspired Training"; case .elliptical: return "Elliptical"; case .equestrianSports: return "Equestrian Sports"; case .fencing: return "Fencing"; case .fishing: return "Fishing"; case .functionalStrengthTraining: return "Functional Strength Training"; case .golf: return "Golf"; case .gymnastics: return "Gymnastics"; case .handball: return "Handball"; case .hiking: return "Hiking"; case .hockey: return "Hockey"; case .hunting: return "Hunting"; case .lacrosse: return "Lacrosse"; case .martialArts: return "Martial Arts"; case .mindAndBody: return "Mind and Body"; case .mixedMetabolicCardioTraining: return "Mixed Cardio"; case .paddleSports: return "Paddle Sports"; case .play: return "Play"; case .preparationAndRecovery: return "Preparation and Recovery"; case .racquetball: return "Racquetball"; case .rowing: return "Rowing"; case .rugby: return "Rugby"; case .running: return "Running"; case .sailing: return "Sailing"; case .skatingSports: return "Skating Sports"; case .snowSports: return "Snow Sports"; case .soccer: return "Soccer"; case .softball: return "Softball"; case .squash: return "Squash"; case .stairClimbing: return "Stair Climbing"; case .surfingSports: return "Surfing Sports"; case .swimming: return "Swimming"; case .tableTennis: return "Table Tennis"; case .tennis: return "Tennis"; case .trackAndField: return "Track and Field"; case .traditionalStrengthTraining: return "Traditional Strength Training"; case .volleyball: return "Volleyball"; case .walking: return "Walking"; case .waterFitness: return "Water Fitness"; case .waterPolo: return "Water Polo"; case .waterSports: return "Water Sports"; case .wrestling: return "Wrestling"; case .yoga: return "Yoga"; case .barre: return "Barre"; case .coreTraining: return "Core Training"; case .crossCountrySkiing: return "Cross Country Skiing"; case .downhillSkiing: return "Downhill Skiing"; case .flexibility: return "Flexibility"; case .highIntensityIntervalTraining: return "HIIT"; case .jumpRope: return "Jump Rope"; case .kickboxing: return "Kickboxing"; case .pilates: return "Pilates"; case .snowboarding: return "Snowboarding"; case .stairs: return "Stairs"; case .stepTraining: return "Step Training"; case .wheelchairWalkPace: return "Wheelchair Walk Pace"; case .wheelchairRunPace: return "Wheelchair Run Pace"; case .taiChi: return "Tai Chi"; case .mixedCardio: return "Mixed Cardio"; case .handCycling: return "Hand Cycling"; case .discSports: return "Disc Sports"; case .fitnessGaming: return "Fitness Gaming"; case .cardioDance: return "Cardio Dance"; case .socialDance: return "Social Dance"; case .pickleball: return "Pickleball"; case .cooldown: return "Cooldown"; case .swimBikeRun: return "Swim Bike Run"; default: return "Other"
-          }
+         switch self {
+         case .americanFootball: return "American Football"; case .archery: return "Archery"; case .australianFootball: return "Australian Football"; case .badminton: return "Badminton"; case .baseball: return "Baseball"; case .basketball: return "Basketball"; case .bowling: return "Bowling"; case .boxing: return "Boxing"; case .climbing: return "Climbing"; case .cricket: return "Cricket"; case .crossTraining: return "Cross Training"; case .curling: return "Curling"; case .cycling: return "Cycling"; case .dance: return "Dance"; case .danceInspiredTraining: return "Dance Inspired Training"; case .elliptical: return "Elliptical"; case .equestrianSports: return "Equestrian Sports"; case .fencing: return "Fencing"; case .fishing: return "Fishing"; case .functionalStrengthTraining: return "Functional Strength Training"; case .golf: return "Golf"; case .gymnastics: return "Gymnastics"; case .handball: return "Handball"; case .hiking: return "Hiking"; case .hockey: return "Hockey"; case .hunting: return "Hunting"; case .lacrosse: return "Lacrosse"; case .martialArts: return "Martial Arts"; case .mindAndBody: return "Mind and Body"; case .mixedMetabolicCardioTraining: return "Mixed Cardio"; case .paddleSports: return "Paddle Sports"; case .play: return "Play"; case .preparationAndRecovery: return "Preparation and Recovery"; case .racquetball: return "Racquetball"; case .rowing: return "Rowing"; case .rugby: return "Rugby"; case .running: return "Running"; case .sailing: return "Sailing"; case .skatingSports: return "Skating Sports"; case .snowSports: return "Snow Sports"; case .soccer: return "Soccer"; case .softball: return "Softball"; case .squash: return "Squash"; case .stairClimbing: return "Stair Climbing"; case .surfingSports: return "Surfing Sports"; case .swimming: return "Swimming"; case .tableTennis: return "Table Tennis"; case .tennis: return "Tennis"; case .trackAndField: return "Track and Field"; case .traditionalStrengthTraining: return "Traditional Strength Training"; case .volleyball: return "Volleyball"; case .walking: return "Walking"; case .waterFitness: return "Water Fitness"; case .waterPolo: return "Water Polo"; case .waterSports: return "Water Sports"; case .wrestling: return "Wrestling"; case .yoga: return "Yoga"; case .barre: return "Barre"; case .coreTraining: return "Core Training"; case .crossCountrySkiing: return "Cross Country Skiing"; case .downhillSkiing: return "Downhill Skiing"; case .flexibility: return "Flexibility"; case .highIntensityIntervalTraining: return "HIIT"; case .jumpRope: return "Jump Rope"; case .kickboxing: return "Kickboxing"; case .pilates: return "Pilates"; case .snowboarding: return "Snowboarding"; case .stairs: return "Stairs"; case .stepTraining: return "Step Training"; case .wheelchairWalkPace: return "Wheelchair Walk Pace"; case .wheelchairRunPace: return "Wheelchair Run Pace"; case .taiChi: return "Tai Chi"; case .mixedCardio: return "Mixed Cardio"; case .handCycling: return "Hand Cycling"; case .discSports: return "Disc Sports"; case .fitnessGaming: return "Fitness Gaming"; case .cardioDance: return "Cardio Dance"; case .socialDance: return "Social Dance"; case .pickleball: return "Pickleball"; case .cooldown: return "Cooldown"; case .swimBikeRun: return "Swim Bike Run"; default: return "Other"
+         }
      }
  }
