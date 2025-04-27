@@ -433,8 +433,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="gray" title="Claim In Game Rewards"/>
                                 <connections>
-                                    <action selector="ClaimRewardsAction:" destination="xqB-HD-61M" eventType="touchUpInside" id="R52-X3-UWe"/>
-                                    <segue destination="fCl-5B-xOO" kind="show" id="svk-vK-fSd"/>
+                                    <segue destination="fCl-5B-xOO" kind="show" id="LmW-eB-TKJ"/>
                                 </connections>
                             </button>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Fin and Recycle" translatesAutoresizingMaskIntoConstraints="NO" id="33r-Bq-FBr">
@@ -584,6 +583,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
+        <segue reference="LmW-eB-TKJ"/>
         <segue reference="Zse-eh-vSt"/>
     </inferredMetricsTieBreakers>
     <resources>

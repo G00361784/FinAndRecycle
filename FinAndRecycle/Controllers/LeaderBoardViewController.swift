@@ -15,135 +15,137 @@ class LeaderBoardViewController: UIViewController, UITableViewDataSource  {
     
     @IBOutlet weak var tableView: UITableView!
     
-    @IBAction func ClaimRewardsAction(_ sender: Any) {
-            guard let currentUser = Auth.auth().currentUser else {
-                showLoginWarning()
-                return
+            var ref: DatabaseReference!
+            var leaderboardUsers: [[String: Any]] = []
+
+            override func viewDidLoad() {
+                super.viewDidLoad()
+                tableView.register(UITableViewCell.self, forCellReuseIdentifier: "userCell")
+                tableView.dataSource = self
+                ref = Database.database().reference()
+
+                // Removed the FirebaseAuth check from here
+                fetchLeaderboardData()
+
+                // Optional: Add a Login button programmatically if not using Storyboard
+                // setupLoginButton() // Example function call
             }
 
-            let userID = currentUser.uid
-            let userRef = ref.child("users").child(userID)
+            // --- NEW: Action for a dedicated Login Button ---
+            // You need to add a UIButton in your Storyboard for this View Controller
+            // and connect its "Touch Up Inside" event to this IBAction.
+            @IBAction func loginButtonTapped(_ sender: UIButton) {
+                print("Login button tapped, redirecting...")
+                redirectToLogin()
+            }
+            // -----------------------------------------------
 
-            let updateData = ["rewardsClaimed": true]
 
-            userRef.updateChildValues(updateData) { (error, dbRef) in
-                DispatchQueue.main.async {
-                    if let error = error {
-                        print("Error updating rewards status: \(error.localizedDescription)")
-                        let errorAlert = UIAlertController(title: "Error", message: "Could not claim rewards. Please try again. (\(error.localizedDescription))", preferredStyle: .alert)
-                        errorAlert.addAction(UIAlertAction(title: "OK", style: .default))
-                        self.present(errorAlert, animated: true)
-                    } else {
-                       
-                    }
+            // Kept: This function redirects to the Login screen using Storyboard ID
+            func redirectToLogin() {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                // Ensure "LoginViewController" is the correct Storyboard ID for your Login VC in Main.storyboard
+                if let loginVC = storyboard.instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
+                    loginVC.modalPresentationStyle = .fullScreen // Or your preferred style
+                    present(loginVC, animated: true, completion: nil)
+                } else {
+                    // Log an error if the Login VC cannot be found
+                    print("Error: Could not instantiate LoginViewController from Storyboard. Check Storyboard ID.")
+                    // Optionally show an alert to the user here
+                    let alert = UIAlertController(title: "Error", message: "Could not navigate to login screen.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    present(alert, animated: true)
                 }
             }
-        }
-           var ref: DatabaseReference!
-           var leaderboardUsers: [[String: Any]] = []
 
-           override func viewDidLoad() {
-               super.viewDidLoad()
-               tableView.register(UITableViewCell.self, forCellReuseIdentifier: "userCell")
-               tableView.dataSource = self
-               ref = Database.database().reference()
+            // Removed: showLoginWarning - No longer needed as redirect is manual
 
-               if Auth.auth().currentUser == nil {
-                   print("User not logged in. Some features might be disabled.")
-               }
-               fetchLeaderboardData()
-           }
+            // --- Data Fetching and Display Logic (Remains the same) ---
 
-           @IBAction func checkUserLogin(_ sender: UIButton) {
-               if Auth.auth().currentUser == nil {
-                   showLoginWarning()
-               } else {
-                    let loggedInAlert = UIAlertController(title: "Logged In", message: "You are logged in.", preferredStyle: .alert)
-                    loggedInAlert.addAction(UIAlertAction(title: "OK", style: .default))
-                    present(loggedInAlert, animated: true)
-               }
-           }
-
-           func showLoginWarning() {
-               let alert = UIAlertController(title: "Login Required",
-                                             message: "You need to be logged in to claim rewards.",
-                                             preferredStyle: .alert)
-               alert.addAction(UIAlertAction(title: "OK", style: .cancel))
-               alert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
-                   self.redirectToLogin()
-               }))
-               present(alert, animated: true, completion: nil)
-           }
-
-           func redirectToLogin() {
-               let storyboard = UIStoryboard(name: "Main", bundle: nil)
-               if let loginVC = storyboard.instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
-                   loginVC.modalPresentationStyle = .fullScreen
-                   present(loginVC, animated: true, completion: nil)
-               } else {
-                    print("Error: Could not instantiate LoginViewController from Storyboard.")
-               }
-           }
-
-           func fetchLeaderboardData() {
-               ref.child("users").observeSingleEvent(of: .value, with: { (snapshot) in
-                   guard let usersData = snapshot.value as? [String: [String: Any]] else {
+            func fetchLeaderboardData() {
+                ref.child("users").observeSingleEvent(of: .value, with: { (snapshot) in
+                    guard let usersData = snapshot.value as? [String: [String: Any]] else {
                         print("Could not fetch or parse users data.")
-                        self.leaderboardUsers = []
-                        self.tableView.reloadData()
+                        DispatchQueue.main.async {
+                            self.leaderboardUsers = []
+                            self.tableView.reloadData()
+                        }
                         return
-                   }
+                    }
 
-                   let usersWithScores = usersData.values.filter { userData in
-                       if let score = userData["score"] {
-                           return score is Int || score is Double || score is String
-                       }
-                       return false
-                   }
+                    let usersWithScores = usersData.values.filter { userData in
+                        if let score = userData["score"] {
+                            return score is Int || score is Double || score is String
+                        }
+                        return false
+                    }
 
-                   self.leaderboardUsers = usersWithScores.sorted { (user1Data, user2Data) -> Bool in
-                       let score1 = self.extractScore(from: user1Data["score"])
-                       let score2 = self.extractScore(from: user2Data["score"])
-                       return score1 > score2
-                   }
+                    self.leaderboardUsers = usersWithScores.sorted { (user1Data, user2Data) -> Bool in
+                        let score1 = self.extractScore(from: user1Data["score"])
+                        let score2 = self.extractScore(from: user2Data["score"])
+                        return score1 > score2
+                    }
 
-                   DispatchQueue.main.async {
-                       self.tableView.reloadData()
-                   }
-               }) { (error) in
-                   print("Firebase Database error: \(error.localizedDescription)")
-                    self.leaderboardUsers = []
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                     }
-               }
-           }
+                }) { (error) in
+                    print("Firebase Database error: \(error.localizedDescription)")
+                     DispatchQueue.main.async {
+                        self.leaderboardUsers = []
+                        self.tableView.reloadData()
+                    }
+                }
+            }
 
-           private func extractScore(from value: Any?) -> Int {
-               if let intScore = value as? Int {
-                   return intScore
-               } else if let doubleScore = value as? Double {
-                   return Int(doubleScore)
-               } else if let stringScore = value as? String, let intScore = Int(stringScore) {
+            private func extractScore(from value: Any?) -> Int {
+                if let intScore = value as? Int {
                     return intScore
-               }
-               return 0
-           }
+                } else if let doubleScore = value as? Double {
+                    return Int(doubleScore)
+                } else if let stringScore = value as? String, let intScore = Int(stringScore) {
+                    return intScore
+                }
+                return 0
+            }
 
-           func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-               return leaderboardUsers.count
-           }
+            // MARK: - UITableViewDataSource Methods (Unchanged)
 
-           func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-               let cell = tableView.dequeueReusableCell(withIdentifier: "userCell", for: indexPath)
-               let userData = leaderboardUsers[indexPath.row]
+            func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+                return leaderboardUsers.count
+            }
 
-               let email = userData["email"] as? String ?? "No Email"
-               let score = extractScore(from: userData["score"])
+            func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "userCell", for: indexPath)
+                let userData = leaderboardUsers[indexPath.row]
 
-               cell.textLabel?.text = "\(indexPath.row + 1). \(email) - Score: \(score)"
-               cell.textLabel?.numberOfLines = 0
+                let email = userData["email"] as? String ?? "No Email"
+                let score = extractScore(from: userData["score"])
 
-               return cell
-           }
-       }
+                cell.textLabel?.text = "\(indexPath.row + 1). \(email) - Score: \(score)"
+                cell.textLabel?.numberOfLines = 0
+
+                return cell
+            }
+
+            // --- Example: How to add a login button programmatically (if needed) ---
+            /*
+            func setupLoginButton() {
+                let loginButton = UIButton(type: .system)
+                loginButton.setTitle("Go to Login", for: .normal)
+                loginButton.translatesAutoresizingMaskIntoConstraints = false
+                loginButton.addTarget(self, action: #selector(loginButtonTappedAction), for: .touchUpInside) // Use different selector if IBAction exists
+                view.addSubview(loginButton)
+
+                // Add constraints for the button (e.g., pin to bottom or top corner)
+                NSLayoutConstraint.activate([
+                    loginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                    loginButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20) // Example position
+                ])
+            }
+
+            @objc func loginButtonTappedAction() { // Need separate @objc func if adding programmatically AND using IBAction
+                 redirectToLogin()
+            }
+            */
+        }
