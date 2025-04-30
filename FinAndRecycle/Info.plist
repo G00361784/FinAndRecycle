@@ -2,18 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Share Location with us?</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Share Location with us?</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Share Location with us?</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Share Health Data with us?</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Share Health Data with us?</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Share Health Data With Us?</string>
+	<string>Add Location Data?</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

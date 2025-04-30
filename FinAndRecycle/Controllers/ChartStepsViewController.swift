@@ -11,17 +11,16 @@ struct ChartDataPoint: Identifiable {
 
 struct ContentView: View {
     @State private var stepData: [ChartDataPoint] = []
-    @State private var isLoading: Bool = true // Start as true, set to false after generating data
-    @State private var errorMessage: String? = nil // Keep for potential non-HK errors
+    @State private var isLoading: Bool = true
+    @State private var errorMessage: String? = nil
 
     private let carbonFactor: Double = 0.2 / 1000
-    private let hardcodedSteps: Double = 7500.0 // Define the hardcoded step value
+    private let hardcodedSteps: Double = 7500.0
 
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
                 if isLoading {
-                    // Changed loading text slightly as we aren't fetching HK data anymore
                     ProgressView("Loading Chart Data...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let errorMessage = errorMessage {
@@ -30,7 +29,6 @@ struct ContentView: View {
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if stepData.isEmpty {
-                     // This case might not be reached with hardcoded data unless generation fails
                      Text("No step data to display.")
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -140,13 +138,12 @@ struct ContentView: View {
             }
         }
 
-        // Data is generated chronologically, reverse it so newest date is last (optional, depends on desired chart order)
-        // Or sort by date ascending for typical chart presentation
+        
         self.stepData = tempData.sorted { $0.date < $1.date }
         self.isLoading = false // Mark loading as complete
         print("Hardcoded step data generated: \(self.stepData.count) points")
     }
-    // --- End Modification ---
+
 
     // --- REMOVED HealthKit Fetching Logic from ContentView ---
     // func fetchStepData() { ... } // Removed
